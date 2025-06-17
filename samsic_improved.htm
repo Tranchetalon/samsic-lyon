@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAMSIC SÉCURITÉ - Agence de Lyon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Form */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-form {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .login-title {
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Main Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo {
+            max-width: 80px;
+            height: auto;
+            margin-right: 20px;
+            border-radius: 5px;
+        }
+
+        .header-title {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .breadcrumb {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-area {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+
+        .page-title {
+            color: #2c3e50;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .theme-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-color: #3498db;
+        }
+
+        .theme-card.add-theme {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .theme-card.add-theme:hover {
+            border-color: #fff;
+        }
+
+        .theme-emoji {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .theme-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .theme-card.add-theme .theme-title {
+            color: white;
+        }
+
+        .theme-description {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .link-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 2px solid #ecf0f1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-color: #3498db;
+        }
+
+        .link-emoji {
+            font-size: 32px;
+            margin-right: 15px;
+        }
+
+        .link-info {
+            flex-grow: 1;
+        }
+
+        .link-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .link-type {
+            font-size: 12px;
+            color: #7f8c8d;
+            background: #ecf0f1;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .back-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #7f8c8d;
+        }
+
+        .add-link-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-link-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+            margin-top: -10px;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal .form-group input, .modal .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .modal-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .modal-btn:hover {
+            background: #2980b9;
+        }
+
+        .cancel-btn {
+            background: #95a5a6;
+        }
+
+        .cancel-btn:hover {
+            background: #7f8c8d;
+        }
+
+        .save-config-btn {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 20px 0;
+            transition: background 0.3s;
+        }
+
+        .save-config-btn:hover {
+            background: #e67e22;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .themes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .links-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .header-left {
+                flex-direction: column;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            max-width: 300px;
+        }
+
+        .notification.success {
+            background: #2ecc71;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .notification.error {
+            background: #e74c3c;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-form">
+            <div class="logo-container">
+                <img src="https://www.agoramanagers-events.com/wp-content/uploads/importedmedia/partenaires/partenaire-9889.png" alt="SAMSIC Logo" class="logo">
+            </div>
+            <h1 class="login-title">Connexion</h1>
+            <p class="login-subtitle">Accès sécurisé à l'agence de Lyon</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Identifiant</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-btn">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <div class="container">
+            <div class="header">
+                <div class="header-left">
+                    <img src="https://www.agoramanagers-events.com/wp-content/uploads/importedmedia/partenaires/partenaire-9889.png" alt="SAMSIC Logo" class="header-logo">
+                    <div>
+                        <h1 class="header-title" id="headerTitle">SAMSIC SÉCURITÉ</h1>
+                        <p class="header-subtitle">Agence de Lyon</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">👤 Utilisateur connecté</div>
+                    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+                </div>
+            </div>
+
+            <div id="breadcrumb" class="breadcrumb hidden">
+                <span id="breadcrumbContent"></span>
+            </div>
+
+            <div class="content-area">
+                <!-- Home Page -->
+                <div id="homePage">
+                    <h2 class="page-title">Tableau de Bord Principal</h2>
+                    <button class="save-config-btn" onclick="saveConfigurationToFile()">
+                        💾 Sauvegarder la configuration
+                    </button>
+                    <div class="themes-grid" id="themesGrid">
+                        <!-- Themes will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Theme Pages -->
+                <div id="themePage" class="hidden">
+                    <button class="back-btn" onclick="showHome()">← Retour à l'accueil</button>
+                    <h2 class="page-title" id="themePageTitle"></h2>
+                    <button class="add-link-btn" onclick="showAddLinkModal()">
+                        ➕ Ajouter un nouveau lien
+                    </button>
+                    <div class="links-grid" id="linksGrid">
+                        <!-- Links will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Theme Modal -->
+    <div id="addThemeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addThemeModal')">&times;</span>
+            <h3 class="modal-title">Ajouter un nouveau thème</h3>
+            <form id="addThemeForm">
+                <div class="form-group">
+                    <label for="themeEmoji">Emoji</label>
+                    <input type="text" id="themeEmoji" name="themeEmoji" placeholder="📁" required>
+                </div>
+                <div class="form-group">
+                    <label for="themeName">Nom du thème</label>
+                    <input type="text" id="themeName" name="themeName" placeholder="Nouveau thème" required>
+                </div>
+                <div class="form-group">
+                    <label for="themeDescription">Description</label>
+                    <input type="text" id="themeDescription" name="themeDescription" placeholder="Description du thème">
+                </div>
+                <button type="submit" class="modal-btn">Ajouter</button>
+                <button type="button" class="modal-btn cancel-btn" onclick="closeModal('addThemeModal')">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Link Modal -->
+    <div id="addLinkModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addLinkModal')">&times;</span>
+            <h3 class="modal-title">Ajouter un nouveau lien</h3>
+            <form id="addLinkForm">
+                <div class="form-group">
+                    <label for="linkEmoji">Emoji</label>
+                    <input type="text" id="linkEmoji" name="linkEmoji" placeholder="📄" required>
+                </div>
+                <div class="form-group">
+                    <label for="linkTitle">Titre</label>
+                    <input type="text" id="linkTitle" name="linkTitle" placeholder="Nom du document" required>
+                </div>
+                <div class="form-group">
+                    <label for="linkUrl">Lien Google Drive</label>
+                    <input type="url" id="linkUrl" name="linkUrl" placeholder="https://drive.google.com/..." required>
+                </div>
+                <div class="form-group">
+                    <label for="linkType">Type</label>
+                    <select id="linkType" name="linkType" required>
+                        <option value="dossier">Dossier</option>
+                        <option value="document">Document</option>
+                        <option value="fichier">Fichier</option>
+                    </select>
+                </div>
+                <button type="submit" class="modal-btn">Ajouter</button>
+                <button type="button" class="modal-btn cancel-btn" onclick="closeModal('addLinkModal')">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentUser = null;
+        let currentTheme = null;
+        
+        // Configuration actuelle - cette partie sera remplacée par les données sauvegardées
+        const configuration = {
+            themes: [
+                {
+                    id: 'rh',
+                    emoji: '👥',
+                    title: 'Ressources Humaines',
+                    description: 'Gestion du personnel et documents RH'
+                },
+                {
+                    id: 'materiel',
+                    emoji: '🛠️',
+                    title: 'Matériel',
+                    description: 'Équipements et inventaire'
+                },
+                {
+                    id: 'mase',
+                    emoji: '🛡️',
+                    title: 'MASE',
+                    description: 'Sécurité et prévention'
+                },
+                {
+                    id: 'finances',
+                    emoji: '💰',
+                    title: 'Finances',
+                    description: 'Comptabilité et gestion financière'
+                },
+                {
+                    id: 'formations',
+                    emoji: '📚',
+                    title: 'Formations',
+                    description: 'Programmes de formation'
+                }
+            ],
+            links: {
+                'rh': [
+                    {
+                        emoji: '📊',
+                        title: 'Tableau de suivi',
+                        url: 'https://drive.google.com/drive/folders/1M6kKL7unmuu0Uq1WHUZBWxdsMkfQkj3O',
+                        type: 'dossier'
+                    },
+                    {
+                        emoji: '⚖️',
+                        title: 'Disciplinaire',
+                        url: 'https://drive.google.com/drive/folders/1KJIg1gG6JjcjKjDQJIF03kT_5RWJJpi_',
+                        type: 'dossier'
+                    },
+                    {
+                        emoji: '🔍',
+                        title: 'Analyse AT',
+                        url: 'https://drive.google.com/drive/folders/1iG3JS1xylfqwPp8yLzyW_gLSb5nG2O0C',
+                        type: 'dossier'
+                    },
+                    {
+                        emoji: '📋',
+                        title: 'Extraction hebdomadaire',
+                        url: 'https://docs.google.com/spreadsheets/d/1DVKv3LWtwg79BNcY755vZMzWyGtdhY5DOjpEWNhQfr4',
+                        type: 'document'
+                    }
+                ],
+                'materiel': [
+                    {
+                        emoji: '📦',
+                        title: 'Dossier générique',
+                        url: 'https://drive.google.com/drive/folders/1BKAFAKSZL2MGfe9HlJEkRUovm85voruf',
+                        type: 'dossier'
+                    }
+                ],
+                'mase': [
+                    {
+                        emoji: '📈',
+                        title: 'Suivi 2024',
+                        url: 'https://drive.google.com/drive/folders/1gYSB-3IIqSkVv6YgW6QHQ6-ydV5LLAQ8',
+                        type: 'dossier'
+                    },
+                    {
+                        emoji: '📊',
+                        title: 'Suivi 2025',
+                        url: 'https://drive.google.com/drive/folders/1xts_xuGBmTr8Bjd-ukqzm6AVC3wqc0L1',
+                        type: 'dossier'
+                    },
+                    {
+                        emoji: '📋',
+                        title: 'Plans de préventions',
+                        url: 'https://drive.google.com/drive/folders/10-FBIaX_NLb3zaeL99CmK9P8TI71jDci',
+                        type: 'dossier'
+                    },
+                    {
+                        emoji: '💬',
+                        title: 'Causeries sécurité 2025',
+                        url: 'https://drive.google.com/drive/folders/1eW8KlDGYgNk0sZ-S99sswmMOWoK25RMg',
+                        type: 'dossier'
+                    }
+                ],
+                'finances': [
+                    {
+                        emoji: '👨‍🎓',
+                        title: 'Suivi absences alternants',
+                        url: 'https://docs.google.com/spreadsheets/d/1phwu8F_8MP9istavG-ABKiyok9hwFGv597EPl9CvD60',
+                        type: 'fichier'
+                    },
+                    {
+                        emoji: '➕',
+                        title: 'Suivi prestations supplémentaires',
+                        url: 'https://docs.google.com/spreadsheets/d/1_J_z9yi73DIAu2qlEZ4Q9cIQ3vEN2e5ObSjNcWW-7xc',
+                        type: 'fichier'
+                    },
+                    {
+                        emoji: '🏫',
+                        title: 'Suivi UCBL',
+                        url: 'https://docs.google.com/spreadsheets/d/1VuOTbE5jIrKXxKMIW8uuqe53ZSWhmuhOQEQFra2OEhg',
+                        type: 'fichier'
+                    }
+                ],
+                'formations': [
+                    {
+                        emoji: '📚',
+                        title: 'Dossier générique',
+                        url: 'https://drive.google.com/drive/folders/1skwXN-VxzjaGjf9QtkceJrBqenpd6CjE',
+                        type: 'dossier'
+                    }
+                ]
+            }
+        };
+
+        // Authentication
+        function login(username, password) {
+            // Simple authentication (sera remplacé par une vraie authentification)
+            if (username === 'admin' && password === 'samsic2025') {
+                currentUser = username;
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                showHome();
+                return true;
+            }
+            return false;
+        }
+
+        function logout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                currentUser = null;
+                currentTheme = null;
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('dashboard').style.display = 'none';
+                document.getElementById('loginForm').reset();
+            }
+        }
+
+        // Navigation
+        function showHome() {
+            currentTheme = null;
+            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('themePage').classList.add('hidden');
+            document.getElementById('breadcrumb').classList.add('hidden');
+            document.getElementById('headerTitle').textContent = 'SAMSIC SÉCURITÉ';
+            renderThemes();
+        }
+
+        function showTheme(themeId) {
+            const theme = configuration.themes.find(t => t.id === themeId);
+            
+            if (!theme) return;
+            
+            currentTheme = themeId;
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('themePage').classList.remove('hidden');
+            document.getElementById('breadcrumb').classList.remove('hidden');
+            
+            document.getElementById('themePageTitle').textContent = theme.title;
+            document.getElementById('headerTitle').textContent = theme.title;
+            document.getElementById('breadcrumbContent').innerHTML = 
+                `<a href="#" onclick="showHome()">Accueil</a> > ${theme.title}`;
+            
+            renderLinks(themeId);
+        }
+
+        // Rendering
+        function renderThemes() {
+            const grid = document.getElementById('themesGrid');
+            grid.innerHTML = '';
+
+            // Render existing themes
+            configuration.themes.forEach(theme => {
+                const themeCard = document.createElement('div');
+                themeCard.className = 'theme-card';
+                themeCard.onclick = () => showTheme(theme.id);
+                themeCard.innerHTML = `
+                    <span class="theme-emoji">${theme.emoji}</span>
+                    <h3 class="theme-title">${theme.title}</h3>
+                    <p class="theme-description">${theme.description}</p>
+                `;
+                grid.appendChild(themeCard);
+            });
+
+            // Add new theme button
+            const addThemeCard = document.createElement('div');
+            addThemeCard.className = 'theme-card add-theme';
+            addThemeCard.onclick = showAddThemeModal;
+            addThemeCard.innerHTML = `
+                <span class="theme-emoji">➕</span>
+                <h3 class="theme-title">Créer un nouveau thème</h3>
+                <p class="theme-description">Ajouter une nouvelle catégorie</p>
+            `;
+            grid.appendChild(addThemeCard);
+        }
+
+        function renderLinks(themeId) {
+            const grid = document.getElementById('linksGrid');
+            grid.innerHTML = '';
+
+            const links = configuration.links[themeId] || [];
+            
+            links.forEach(link => {
+                const linkCard = document.createElement('div');
+                linkCard.className = 'link-card';
+                linkCard.onclick = () => window.open(link.url, '_blank');
+                linkCard.innerHTML = `
+                    <span class="link-emoji">${link.emoji}</span>
+                    <div class="link-info">
+                        <div class="link-title">${link.title}</div>
+                        <span class="link-type">${link.type}</span>
+                    </div>
+                `;
+                grid.appendChild(linkCard);
+            });
+        }
+
+        // Modals
+        function showAddThemeModal() {
+            document.getElementById('addThemeModal').style.display = 'block';
+        }
+
+        function showAddLinkModal() {
+            if (!currentTheme) return;
+            document.getElementById('addLinkModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Configuration Management
+        function saveConfigurationToFile() {
+            const configString = generateConfigurationCode();
+            
+            // Créer un blob avec le contenu
+            const blob = new Blob([configString], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            
+            // Créer un lien de téléchargement
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'samsic-configuration.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Configuration sauvegardée avec succès !', 'success');
+        }
+
+        function generateConfigurationCode() {
+            return `// Configuration SAMSIC - Généré automatiquement le ${new Date().toLocaleString('fr-FR')}
+
+const configuration = ${JSON.stringify(configuration, null, 4)};
+
+// Pour utiliser cette configuration, remplacez la variable 'configuration' dans votre fichier HTML
+// par le contenu ci-dessus.`;
+        }
+
+        // Utility functions
+        function validateGoogleDriveUrl(url) {
+            const drivePattern = /^https:\/\/(drive\.google\.com|docs\.google\.com)/;
+            return drivePattern.test(url);
+        }
+
+        function formatThemeId(name) {
+            return name.toLowerCase()
+                      .replace(/\s+/g, '_')
+                      .replace(/[^a-z0-9_]/g, '')
+                      .substring(0, 20);
+        }
+
+        function showNotification(message, type = 'success') {
+            // Supprimer les notifications existantes
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, type === 'error' ? 5000 : 3000);
+        }
+
+        // Event Listeners
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!login(username, password)) {
+                showNotification('Identifiants incorrects', 'error');
+            }
+        });
+
+        document.getElementById('addThemeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const emoji = document.getElementById('themeEmoji').value;
+            const name = document.getElementById('themeName').value;
+            const description = document.getElementById('themeDescription').value;
+            
+            const themeId = formatThemeId(name);
+            
+            // Vérifier si le thème existe déjà
+            if (configuration.themes.some(theme => theme.id === themeId)) {
+                showNotification('Un thème avec ce nom existe déjà', 'error');
+                return;
+            }
+            
+            const newTheme = {
+                id: themeId,
+                emoji: emoji,
+                title: name,
+                description: description
+            };
+            
+            configuration.themes.push(newTheme);
+            configuration.links[newTheme.id] = [];
+            
+            closeModal('addThemeModal');
+            this.reset();
+            renderThemes();
+            showNotification('Nouveau thème créé avec succès !', 'success');
+        });
+
+        document.getElementById('addLinkForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!currentTheme) return;
+            
+            const emoji = document.getElementById('linkEmoji').value;
+            const title = document.getElementById('linkTitle').value;
+            const url = document.getElementById('linkUrl').value;
+            const type = document.getElementById('linkType').value;
+            
+            if (!validateGoogleDriveUrl(url)) {
+                showNotification('Veuillez entrer un lien Google Drive valide', 'error');
+                return;
+            }
+            
+            const newLink = {
+                emoji: emoji,
+                title: title,
+                url: url,
+                type: type
+            };
+            
+            if (!configuration.links[currentTheme]) {
+                configuration.links[currentTheme] = [];
+            }
+            
+            configuration.links[currentTheme].push(newLink);
+            
+            closeModal('addLinkModal');
+            this.reset();
+            renderLinks(currentTheme);
+            showNotification('Nouveau lien ajouté avec succès !', 'success');
+        });
+
+        // Enhanced form validation
+        document.getElementById('addLinkForm').addEventListener('input', function(e) {
+            if (e.target.name === 'linkUrl') {
+                const url = e.target.value;
+                const isValid = validateGoogleDriveUrl(url);
+                
+                if (url && !isValid) {
+                    e.target.style.borderColor = '#e74c3c';
+                    e.target.title = 'Veuillez entrer un lien Google Drive valide';
+                } else {
+                    e.target.style.borderColor = '#ecf0f1';
+                    e.target.title = '';
+                }
+            }
+        });
+
+        document.getElementById('themeName').addEventListener('input', function(e) {
+            const name = e.target.value;
+            const id = formatThemeId(name);
+            
+            const exists = configuration.themes.some(theme => theme.id === id);
+            
+            if (exists && name) {
+                e.target.style.borderColor = '#f39c12';
+                e.target.title = 'Un thème avec ce nom existe déjà';
+            } else {
+                e.target.style.borderColor = '#ecf0f1';
+                e.target.title = '';
+            }
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // ESC to close modals
+            if (e.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (modal.style.display === 'block') {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Alt + H to go home
+            if (e.altKey && e.key === 'h') {
+                e.preventDefault();
+                if (currentUser) {
+                    showHome();
+                }
+            }
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            document.title = 'SAMSIC Sécurité - Agence de Lyon';
+            
+            // Prevent form submission on Enter in emoji fields
+            document.querySelectorAll('input[name="themeEmoji"], input[name="linkEmoji"]').forEach(input => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
