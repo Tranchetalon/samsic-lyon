@@ -899,6 +899,7 @@
                 if (error) throw error;
 
                 themes = data || [];
+                await loadUserPermissions(); // Charger les permissions utilisateur
                 renderThemes();
             } catch (error) {
                 console.error('Erreur lors du chargement des thèmes:', error);
@@ -924,8 +925,81 @@
             }
         }
 
+        // Charger les permissions de l'utilisateur actuel
+        async function loadUserPermissions() {
+            if (!currentUser) return;
+
+            try {
+                // Récupérer le profil utilisateur avec son rôle
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (profileError) throw profileError;
+
+                // Si admin, pas besoin de charger les permissions spécifiques
+                if (profile.role === 'admin') {
+                    window.userRole = 'admin';
+                    window.userPermissions = {};
+                    return;
+                }
+
+                // Charger les permissions spécifiques pour les managers
+                const { data: permissions, error: permError } = await supabase
+                    .from('user_theme_permissions')
+                    .select('theme_id, can_edit, can_create_links, can_delete_links')
+                    .eq('user_id', currentUser.id);
+
+                if (permError && permError.code !== 'PGRST116') throw permError;
+
+                // Stocker les infos utilisateur globalement
+                window.userRole = profile.role;
+                window.userPermissions = {};
+                
+                if (permissions) {
+                    permissions.forEach(perm => {
+                        window.userPermissions[perm.theme_id] = perm;
+                    });
+                }
+
+            } catch (error) {
+                console.error('Erreur lors du chargement des permissions:', error);
+                // En cas d'erreur, définir comme user basique
+                window.userRole = 'user';
+                window.userPermissions = {};
+            }
+        }
+
+        // Vérifier si l'utilisateur peut modifier un thème
+        function canEditTheme(themeId) {
+            if (!window.userRole) return false;
+            if (window.userRole === 'admin') return true;
+            if (window.userRole === 'manager') {
+                return window.userPermissions[themeId]?.can_edit || false;
+            }
+            return false;
+        }
+
+        // Vérifier si l'utilisateur peut créer des liens
+        function canCreateLinks(themeId) {
+            if (!window.userRole) return false;
+            if (window.userRole === 'admin') return true;
+            if (window.userRole === 'manager') {
+                return window.userPermissions[themeId]?.can_create_links || false;
+            }
+            return false;
+        }
+
         async function addTheme(emoji, title, description) {
             if (!currentUser) return false;
+
+            // Vérifier les permissions
+            if (!window.userRole || (window.userRole !== 'admin' && window.userRole !== 'manager')) {
+                showNotification('Vous n\'avez pas les droits pour créer un thème', 'error');
+                return false;
+            }
 
             try {
                 const themeId = title.toLowerCase()
@@ -975,6 +1049,12 @@
 
         async function addLink(emoji, title, url, type) {
             if (!currentUser || !currentTheme) return false;
+
+            // Vérifier les permissions
+            if (!canCreateLinks(currentTheme)) {
+                showNotification('Vous n\'avez pas les droits pour ajouter un lien à ce thème', 'error');
+                return false;
+            }
 
             try {
                 const { data, error } = await supabase
@@ -1054,16 +1134,18 @@
                 grid.appendChild(themeCard);
             });
 
-            // Add new theme button
-            const addThemeCard = document.createElement('div');
-            addThemeCard.className = 'theme-card add-theme';
-            addThemeCard.onclick = showAddThemeModal;
-            addThemeCard.innerHTML = `
-                <span class="theme-emoji">➕</span>
-                <h3 class="theme-title">Créer un nouveau thème</h3>
-                <p class="theme-description">Ajouter une nouvelle catégorie</p>
-            `;
-            grid.appendChild(addThemeCard);
+            // Add new theme button (seulement pour admin et managers)
+            if (window.userRole === 'admin' || window.userRole === 'manager') {
+                const addThemeCard = document.createElement('div');
+                addThemeCard.className = 'theme-card add-theme';
+                addThemeCard.onclick = showAddThemeModal;
+                addThemeCard.innerHTML = `
+                    <span class="theme-emoji">➕</span>
+                    <h3 class="theme-title">Créer un nouveau thème</h3>
+                    <p class="theme-description">Ajouter une nouvelle catégorie</p>
+                `;
+                grid.appendChild(addThemeCard);
+            }
         }
 
         function renderLinks(themeId) {
@@ -1072,6 +1154,7 @@
 
             const themeLinks = links[themeId] || [];
             
+            // Afficher TOUS les liens pour TOUS les utilisateurs connectés
             themeLinks.forEach(link => {
                 const linkCard = document.createElement('div');
                 linkCard.className = 'link-card';
@@ -1092,15 +1175,36 @@
                 `;
                 grid.appendChild(linkCard);
             });
+
+            // Afficher le bouton "Ajouter lien" seulement si l'utilisateur a les droits
+            const addLinkBtn = document.querySelector('.add-link-btn');
+            if (addLinkBtn) {
+                if (canCreateLinks(themeId)) {
+                    addLinkBtn.style.display = 'flex';
+                } else {
+                    addLinkBtn.style.display = 'none';
+                }
+            }
         }
 
         // Fonctions de modal
         function showAddThemeModal() {
+            // Vérifier les permissions avant d'ouvrir le modal
+            if (!window.userRole || (window.userRole !== 'admin' && window.userRole !== 'manager')) {
+                showNotification('Vous n\'avez pas les droits pour créer un thème', 'error');
+                return;
+            }
             document.getElementById('addThemeModal').style.display = 'block';
         }
 
         function showAddLinkModal() {
             if (!currentTheme) return;
+            
+            // Vérifier les permissions avant d'ouvrir le modal
+            if (!canCreateLinks(currentTheme)) {
+                showNotification('Vous n\'avez pas les droits pour ajouter un lien à ce thème', 'error');
+                return;
+            }
             document.getElementById('addLinkModal').style.display = 'block';
         }
 
