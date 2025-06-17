@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAMSIC SÉCURITÉ - Agence de Lyon</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body data-theme="light">
+    <!-- Barre de recherche globale -->
+    <div class="search-container" id="searchContainer">
+        <div style="position: relative;">
+            <input type="text" class="search-input" id="globalSearch" placeholder="Rechercher dans tous les liens... (Ctrl+K)">
+            <span class="search-icon">🔍</span>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-form">
+            <div class="logo-container">
+                <img src="https://www.agoramanagers-events.com/wp-content/uploads/importedmedia/partenaires/partenaire-9889.png" alt="SAMSIC Logo" class="logo">
+            </div>
+            <h1 class="login-title">Connexion</h1>
+            <p class="login-subtitle">Accès sécurisé à l'agence de Lyon</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn">Se connecter</button>
+            </form>
+            <div class="signup-link">
+                <p>Pas encore de compte ? <a href="#" id="showSignup">Créer un compte</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div id="signupPage" class="login-container hidden">
+        <div class="login-form">
+            <div class="logo-container">
+                <img src="https://www.agoramanagers-events.com/wp-content/uploads/importedmedia/partenaires/partenaire-9889.png" alt="SAMSIC Logo" class="logo">
+            </div>
+            <h1 class="login-title">Créer un compte</h1>
+            <p class="login-subtitle">Rejoindre l'équipe SAMSIC Lyon</p>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" name="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Mot de passe</label>
+                    <input type="password" id="signupPassword" name="signupPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="fullName">Nom complet</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <button type="submit" class="login-btn" id="signupBtn">Créer le compte</button>
+            </form>
+            <div class="signup-link">
+                <p>Déjà un compte ? <a href="#" id="showLogin">Se connecter</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2FA Verification Page -->
+    <div id="verificationPage" class="login-container hidden">
+        <div class="login-form">
+            <div class="logo-container">
+                <img src="https://www.agoramanagers-events.com/wp-content/uploads/importedmedia/partenaires/partenaire-9889.png" alt="SAMSIC Logo" class="logo">
+            </div>
+            <div class="verification-form">
+                <h1 class="login-title">Vérification 2FA</h1>
+                <p class="login-subtitle">Un code a été envoyé à votre email</p>
+                <form id="verificationForm">
+                    <div class="form-group">
+                        <label for="verificationCode">Code de vérification</label>
+                        <input type="text" id="verificationCode" name="verificationCode" class="verification-code-input" 
+                               placeholder="000000" maxlength="6" required>
+                    </div>
+                    <button type="submit" class="login-btn" id="verifyBtn">Vérifier</button>
+                </form>
+                <a href="#" class="resend-code" id="resendCode">Renvoyer le code</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <div class="container">
+            <div class="header">
+                <div class="header-left">
+                    <img src="https://www.agoramanagers-events.com/wp-content/uploads/importedmedia/partenaires/partenaire-9889.png" alt="SAMSIC Logo" class="header-logo">
+                    <div>
+                        <h1 class="header-title" id="headerTitle">SAMSIC SÉCURITÉ</h1>
+                        <p class="header-subtitle">Agence de Lyon</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle" id="themeToggle" title="Changer le thème">🌙</button>
+                    <div class="user-info" id="userInfo">👤 Chargement...</div>
+                    <button class="logout-btn" onclick="logout()">Déconnexion</button>
+                </div>
+            </div>
+
+            <!-- Barre de contrôles et navigation -->
+            <div class="controls-bar" id="controlsBar">
+                <div class="breadcrumb" id="breadcrumbContent">
+                    <span id="breadcrumbText">Tableau de Bord Principal</span>
+                </div>
+                <div class="admin-controls" id="adminControls">
+                    <!-- Boutons admin ajoutés dynamiquement -->
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Home Page -->
+                <div id="homePage">
+                    <h2 class="page-title">Tableau de Bord Principal</h2>
+                    
+                    <!-- Filtres et actions -->
+                    <div class="filters-container">
+                        <button class="favorites-filter" id="favoritesFilter">⭐ Mes Favoris</button>
+                        <div class="filter-group">
+                            <label class="filter-label">Trier par:</label>
+                            <select class="filter-select" id="sortThemes">
+                                <option value="name">Nom</option>
+                                <option value="recent">Plus récent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="themes-grid" id="themesGrid">
+                        <!-- Themes will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Panel d'administration -->
+                    <div class="admin-panel" id="adminPanel">
+                        <div class="admin-section">
+                            <h3>👥 Gestion des Utilisateurs</h3>
+                            <div class="user-list" id="userList">
+                                <!-- Users will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="admin-section">
+                            <h3>📊 Activité Récente</h3>
+                            <div class="activity-list" id="activityList">
+                                <!-- Activity will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Pages -->
+                <div id="themePage" class="hidden">
+                    <button class="back-btn" onclick="showHome()">← Retour à l'accueil</button>
+                    <h2 class="page-title" id="themePageTitle"></h2>
+                    
+                    <!-- Actions pour le thème -->
+                    <div class="action-buttons">
+                        <button class="add-link-btn" id="addLinkBtn" onclick="showAddLinkModal()">
+                            ➕ Ajouter un nouveau lien
+                        </button>
+                        <button class="favorites-filter" id="themeFilterFavorites">⭐ Favoris dans ce thème</button>
+                    </div>
+
+                    <div class="links-grid" id="linksGrid">
+                        <!-- Links will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Theme Modal -->
+    <div id="addThemeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addThemeModal')">&times;</span>
+            <h3 class="modal-title">Ajouter un nouveau thème</h3>
+            <form id="addThemeForm">
+                <div class="form-group">
+                    <label for="themeEmoji">Emoji</label>
+                    <input type="text" id="themeEmoji" name="themeEmoji" placeholder="📁" required>
+                </div>
+                <div class="form-group">
+                    <label for="themeName">Nom du thème</label>
+                    <input type="text" id="themeName" name="themeName" placeholder="Nouveau thème" required>
+                </div>
+                <div class="form-group">
+                    <label for="themeDescription">Description</label>
+                    <input type="text" id="themeDescription" name="themeDescription" placeholder="Description du thème">
+                </div>
+                <button type="submit" class="modal-btn">Ajouter</button>
+                <button type="button" class="modal-btn cancel-btn" onclick="closeModal('addThemeModal')">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Link Modal -->
+    <div id="addLinkModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addLinkModal')">&times;</span>
+            <h3 class="modal-title">Ajouter un nouveau lien</h3>
+            <form id="addLinkForm">
+                <div class="form-group">
+                    <label for="linkEmoji">Emoji</label>
+                    <input type="text" id="linkEmoji" name="linkEmoji" placeholder="📄" required>
+                </div>
+                <div class="form-group">
+                    <label for="linkTitle">Titre</label>
+                    <input type="text" id="linkTitle" name="linkTitle" placeholder="Nom du document" required>
+                </div>
+                <div class="form-group">
+                    <label for="linkUrl">Lien Google Drive</label>
+                    <input type="url" id="linkUrl" name="linkUrl" placeholder="https://drive.google.com/..." required>
+                </div>
+                <div class="form-group">
+                    <label for="linkType">Type</label>
+                    <select id="linkType" name="linkType" required>
+                        <option value="dossier">Dossier</option>
+                        <option value="document">Document</option>
+                        <option value="fichier">Fichier</option>
+                    </select>
+                </div>
+                <button type="submit" class="modal-btn">Ajouter</button>
+                <button type="button" class="modal-btn cancel-btn" onclick="closeModal('addLinkModal')">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Management Modal -->
+    <div id="userManagementModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('userManagementModal')">&times;</span>
+            <h3 class="modal-title">Gestion des Permissions Utilisateur</h3>
+            <div id="userManagementContent">
+                <!-- Content populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/config.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/permissions.js"></script>
+    <script src="js/rendering.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/favorites.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
