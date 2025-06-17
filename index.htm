@@ -4,23 +4,528 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAMSIC SÉCURITÉ - Agence de Lyon</title>
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css">
-    
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body data-theme="light">
-    <!-- Barre de recherche globale -->
-    <div class="search-container" id="searchContainer">
-        <div style="position: relative;">
-            <input type="text" class="search-input" id="globalSearch" placeholder="Rechercher dans tous les liens... (Ctrl+K)">
-            <span class="search-icon">🔍</span>
-            <div class="search-results" id="searchResults"></div>
-        </div>
-    </div>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Form */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-form {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .login-title {
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .signup-link {
+            margin-top: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .signup-link a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo {
+            max-width: 80px;
+            height: auto;
+            margin-right: 20px;
+            border-radius: 5px;
+        }
+
+        .header-title {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .breadcrumb {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .content-area {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+
+        .page-title {
+            color: #2c3e50;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .theme-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-color: #3498db;
+        }
+
+        .theme-card.add-theme {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .theme-card.add-theme:hover {
+            border-color: #fff;
+        }
+
+        .theme-emoji {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .theme-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .theme-card.add-theme .theme-title {
+            color: white;
+        }
+
+        .theme-description {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .link-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 2px solid #ecf0f1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-color: #3498db;
+        }
+
+        .link-emoji {
+            font-size: 32px;
+            margin-right: 15px;
+        }
+
+        .link-info {
+            flex-grow: 1;
+        }
+
+        .link-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .link-type {
+            font-size: 12px;
+            color: #7f8c8d;
+            background: #ecf0f1;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .back-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #7f8c8d;
+        }
+
+        .add-link-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-link-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+            margin-top: -10px;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal .form-group input, .modal .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .modal-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .modal-btn:hover {
+            background: #2980b9;
+        }
+
+        .cancel-btn {
+            background: #95a5a6;
+        }
+
+        .cancel-btn:hover {
+            background: #7f8c8d;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .themes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .links-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .header-left {
+                flex-direction: column;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            max-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #2ecc71;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .notification.error {
+            background: #e74c3c;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
     <!-- Login Page -->
     <div id="loginPage" class="login-container">
         <div class="login-form">
@@ -75,28 +580,6 @@
         </div>
     </div>
 
-    <!-- 2FA Verification Page -->
-    <div id="verificationPage" class="login-container hidden">
-        <div class="login-form">
-            <div class="logo-container">
-                <img src="https://www.agoramanagers-events.com/wp-content/uploads/importedmedia/partenaires/partenaire-9889.png" alt="SAMSIC Logo" class="logo">
-            </div>
-            <div class="verification-form">
-                <h1 class="login-title">Vérification 2FA</h1>
-                <p class="login-subtitle">Un code a été envoyé à votre email</p>
-                <form id="verificationForm">
-                    <div class="form-group">
-                        <label for="verificationCode">Code de vérification</label>
-                        <input type="text" id="verificationCode" name="verificationCode" class="verification-code-input" 
-                               placeholder="000000" maxlength="6" required>
-                    </div>
-                    <button type="submit" class="login-btn" id="verifyBtn">Vérifier</button>
-                </form>
-                <a href="#" class="resend-code" id="resendCode">Renvoyer le code</a>
-            </div>
-        </div>
-    </div>
-
     <!-- Dashboard -->
     <div id="dashboard" class="dashboard">
         <div class="container">
@@ -109,57 +592,21 @@
                     </div>
                 </div>
                 <div class="header-right">
-                    <button class="theme-toggle" id="themeToggle" title="Changer le thème">🌙</button>
                     <div class="user-info" id="userInfo">👤 Chargement...</div>
                     <button class="logout-btn" onclick="logout()">Déconnexion</button>
                 </div>
             </div>
 
-            <!-- Barre de contrôles et navigation -->
-            <div class="controls-bar" id="controlsBar">
-                <div class="breadcrumb" id="breadcrumbContent">
-                    <span id="breadcrumbText">Tableau de Bord Principal</span>
-                </div>
-                <div class="admin-controls" id="adminControls">
-                    <!-- Boutons admin ajoutés dynamiquement -->
-                </div>
+            <div id="breadcrumb" class="breadcrumb hidden">
+                <span id="breadcrumbContent"></span>
             </div>
 
             <div class="content-area">
                 <!-- Home Page -->
                 <div id="homePage">
                     <h2 class="page-title">Tableau de Bord Principal</h2>
-                    
-                    <!-- Filtres et actions -->
-                    <div class="filters-container">
-                        <button class="favorites-filter" id="favoritesFilter">⭐ Mes Favoris</button>
-                        <div class="filter-group">
-                            <label class="filter-label">Trier par:</label>
-                            <select class="filter-select" id="sortThemes">
-                                <option value="name">Nom</option>
-                                <option value="recent">Plus récent</option>
-                            </select>
-                        </div>
-                    </div>
-
                     <div class="themes-grid" id="themesGrid">
                         <!-- Themes will be populated by JavaScript -->
-                    </div>
-
-                    <!-- Panel d'administration -->
-                    <div class="admin-panel" id="adminPanel">
-                        <div class="admin-section">
-                            <h3>👥 Gestion des Utilisateurs</h3>
-                            <div class="user-list" id="userList">
-                                <!-- Users will be populated by JavaScript -->
-                            </div>
-                        </div>
-                        <div class="admin-section">
-                            <h3>📊 Activité Récente</h3>
-                            <div class="activity-list" id="activityList">
-                                <!-- Activity will be populated by JavaScript -->
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -167,15 +614,9 @@
                 <div id="themePage" class="hidden">
                     <button class="back-btn" onclick="showHome()">← Retour à l'accueil</button>
                     <h2 class="page-title" id="themePageTitle"></h2>
-                    
-                    <!-- Actions pour le thème -->
-                    <div class="action-buttons">
-                        <button class="add-link-btn" id="addLinkBtn" onclick="showAddLinkModal()">
-                            ➕ Ajouter un nouveau lien
-                        </button>
-                        <button class="favorites-filter" id="themeFilterFavorites">⭐ Favoris dans ce thème</button>
-                    </div>
-
+                    <button class="add-link-btn" onclick="showAddLinkModal()">
+                        ➕ Ajouter un nouveau lien
+                    </button>
                     <div class="links-grid" id="linksGrid">
                         <!-- Links will be populated by JavaScript -->
                     </div>
@@ -240,29 +681,701 @@
         </div>
     </div>
 
-    <!-- User Management Modal -->
-    <div id="userManagementModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('userManagementModal')">&times;</span>
-            <h3 class="modal-title">Gestion des Permissions Utilisateur</h3>
-            <div id="userManagementContent">
-                <!-- Content populated by JavaScript -->
-            </div>
-        </div>
-    </div>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- JavaScript Modules -->
-    <script src="js/config.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/navigation.js"></script>
-    <script src="js/permissions.js"></script>
-    <script src="js/rendering.js"></script>
-    <script src="js/search.js"></script>
-    <script src="js/favorites.js"></script>
-    <script src="js/admin.js"></script>
-    <script src="js/modals.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/main.js"></script>
+    <script>
+        // Configuration Supabase
+        const SUPABASE_URL = 'https://jyriyfakqbgpqtdxnzpz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5cml5ZmFrcWJncHF0ZHhuenB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxNjQ5MTgsImV4cCI6MjA2NTc0MDkxOH0.daVcvdk2IbyCWNQsLrM2CvVBgJdkAcEWS7iNsa939W4';
+
+        // Initialiser Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // État de l'application
+        let currentUser = null;
+        let currentTheme = null;
+        let themes = [];
+        let links = {};
+
+        // Fonctions utilitaires
+        function showNotification(message, type = 'success') {
+            // Supprimer les notifications existantes
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Déclencher l'animation
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, type === 'error' ? 5000 : 3000);
+        }
+
+        function setLoading(element, isLoading) {
+            if (isLoading) {
+                element.disabled = true;
+                element.innerHTML = '<span class="spinner"></span>' + element.textContent;
+                element.classList.add('loading');
+            } else {
+                element.disabled = false;
+                element.innerHTML = element.textContent.replace('', '');
+                element.classList.remove('loading');
+            }
+        }
+
+        // Fonctions d'authentification
+        async function login(email, password) {
+            const loginBtn = document.getElementById('loginBtn');
+            setLoading(loginBtn, true);
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                currentUser = data.user;
+                await loadUserProfile();
+                showDashboard();
+                showNotification('Connexion réussie !');
+                return true;
+
+            } catch (error) {
+                console.error('Erreur de connexion:', error);
+                showNotification(error.message, 'error');
+                return false;
+            } finally {
+                setLoading(loginBtn, false);
+            }
+        }
+
+        async function signup(email, password, fullName) {
+            const signupBtn = document.getElementById('signupBtn');
+            setLoading(signupBtn, true);
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            username: email
+                        }
+                    }
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                showNotification('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
+                showLoginPage();
+                return true;
+
+            } catch (error) {
+                console.error('Erreur de création de compte:', error);
+                showNotification(error.message, 'error');
+                return false;
+            } finally {
+                setLoading(signupBtn, false);
+            }
+        }
+
+        async function logout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                try {
+                    const { error } = await supabase.auth.signOut();
+                    if (error) throw error;
+                    
+                    currentUser = null;
+                    currentTheme = null;
+                    showLoginPage();
+                    showNotification('Déconnexion réussie');
+                } catch (error) {
+                    console.error('Erreur de déconnexion:', error);
+                    showNotification('Erreur lors de la déconnexion', 'error');
+                }
+            }
+        }
+
+        async function loadUserProfile() {
+            if (!currentUser) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') {
+                    throw error;
+                }
+
+                if (data) {
+                    document.getElementById('userInfo').textContent = `👤 ${data.full_name || data.username}`;
+                } else {
+                    document.getElementById('userInfo').textContent = `👤 ${currentUser.email}`;
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement du profil:', error);
+                document.getElementById('userInfo').textContent = `👤 ${currentUser.email}`;
+            }
+        }
+
+        // Fonctions de navigation
+        function showLoginPage() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('signupPage').classList.add('hidden');
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('loginForm').reset();
+        }
+
+        function showSignupPage() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('signupPage').classList.remove('hidden');
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('signupForm').reset();
+        }
+
+        function showDashboard() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('signupPage').classList.add('hidden');
+            document.getElementById('dashboard').style.display = 'block';
+            showHome();
+        }
+
+        function showHome() {
+            currentTheme = null;
+            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('themePage').classList.add('hidden');
+            document.getElementById('breadcrumb').classList.add('hidden');
+            document.getElementById('headerTitle').textContent = 'SAMSIC SÉCURITÉ';
+            loadThemes();
+        }
+
+        function showTheme(themeId) {
+            const theme = themes.find(t => t.id === themeId);
+            
+            if (!theme) return;
+            
+            currentTheme = themeId;
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('themePage').classList.remove('hidden');
+            document.getElementById('breadcrumb').classList.remove('hidden');
+            
+            document.getElementById('themePageTitle').textContent = theme.title;
+            document.getElementById('headerTitle').textContent = theme.title;
+            document.getElementById('breadcrumbContent').innerHTML = 
+                `<a href="#" onclick="showHome()">Accueil</a> > ${theme.title}`;
+            
+            loadLinks(themeId);
+        }
+
+        // Fonctions de données
+        async function loadThemes() {
+            try {
+                const { data, error } = await supabase
+                    .from('themes')
+                    .select('*')
+                    .order('created_at');
+
+                if (error) throw error;
+
+                themes = data || [];
+                await loadUserPermissions(); // Charger les permissions utilisateur
+                renderThemes();
+            } catch (error) {
+                console.error('Erreur lors du chargement des thèmes:', error);
+                showNotification('Erreur lors du chargement des thèmes', 'error');
+            }
+        }
+
+        async function loadLinks(themeId) {
+            try {
+                const { data, error } = await supabase
+                    .from('links')
+                    .select('*')
+                    .eq('theme_id', themeId)
+                    .order('created_at');
+
+                if (error) throw error;
+
+                links[themeId] = data || [];
+                renderLinks(themeId);
+            } catch (error) {
+                console.error('Erreur lors du chargement des liens:', error);
+                showNotification('Erreur lors du chargement des liens', 'error');
+            }
+        }
+
+        // Charger les permissions de l'utilisateur actuel
+        async function loadUserPermissions() {
+            if (!currentUser) return;
+
+            try {
+                // Récupérer le profil utilisateur avec son rôle
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', currentUser.id)
+                    .single();
+
+                if (profileError) throw profileError;
+
+                // Si admin, pas besoin de charger les permissions spécifiques
+                if (profile.role === 'admin') {
+                    window.userRole = 'admin';
+                    window.userPermissions = {};
+                    return;
+                }
+
+                // Charger les permissions spécifiques pour les managers
+                const { data: permissions, error: permError } = await supabase
+                    .from('user_theme_permissions')
+                    .select('theme_id, can_edit, can_create_links, can_delete_links')
+                    .eq('user_id', currentUser.id);
+
+                if (permError && permError.code !== 'PGRST116') throw permError;
+
+                // Stocker les infos utilisateur globalement
+                window.userRole = profile.role;
+                window.userPermissions = {};
+                
+                if (permissions) {
+                    permissions.forEach(perm => {
+                        window.userPermissions[perm.theme_id] = perm;
+                    });
+                }
+
+            } catch (error) {
+                console.error('Erreur lors du chargement des permissions:', error);
+                // En cas d'erreur, définir comme user basique
+                window.userRole = 'user';
+                window.userPermissions = {};
+            }
+        }
+
+        // Vérifier si l'utilisateur peut modifier un thème
+        function canEditTheme(themeId) {
+            if (!window.userRole) return false;
+            if (window.userRole === 'admin') return true;
+            if (window.userRole === 'manager') {
+                return window.userPermissions[themeId]?.can_edit || false;
+            }
+            return false;
+        }
+
+        // Vérifier si l'utilisateur peut créer des liens
+        function canCreateLinks(themeId) {
+            if (!window.userRole) return false;
+            if (window.userRole === 'admin') return true;
+            if (window.userRole === 'manager') {
+                return window.userPermissions[themeId]?.can_create_links || false;
+            }
+            return false;
+        }
+
+        async function addTheme(emoji, title, description) {
+            if (!currentUser) return false;
+
+            try {
+                const themeId = title.toLowerCase()
+                    .replace(/\s+/g, '_')
+                    .replace(/[^a-z0-9_]/g, '')
+                    .substring(0, 20);
+
+                // Vérifier si le thème existe déjà
+                const existingTheme = themes.find(t => t.id === themeId);
+                if (existingTheme) {
+                    showNotification('Un thème avec ce nom existe déjà', 'error');
+                    return false;
+                }
+
+                const { data, error } = await supabase
+                    .from('themes')
+                    .insert([
+                        {
+                            id: themeId,
+                            emoji: emoji,
+                            title: title,
+                            description: description,
+                            created_by: currentUser.id
+                        }
+                    ])
+                    .select();
+
+                if (error) throw error;
+
+                // Ajouter le thème à la liste locale
+                themes.push(data[0]);
+                links[themeId] = [];
+                
+                // Log de l'activité
+                await logActivity('create_theme', { theme_id: themeId, theme_title: title });
+                
+                renderThemes();
+                showNotification('Thème créé avec succès !');
+                return true;
+
+            } catch (error) {
+                console.error('Erreur lors de la création du thème:', error);
+                showNotification('Erreur lors de la création du thème', 'error');
+                return false;
+            }
+        }
+
+        async function addLink(emoji, title, url, type) {
+            if (!currentUser || !currentTheme) return false;
+
+            try {
+                const { data, error } = await supabase
+                    .from('links')
+                    .insert([
+                        {
+                            theme_id: currentTheme,
+                            emoji: emoji,
+                            title: title,
+                            url: url,
+                            type: type,
+                            created_by: currentUser.id
+                        }
+                    ])
+                    .select();
+
+                if (error) throw error;
+
+                // Ajouter le lien à la liste locale
+                if (!links[currentTheme]) {
+                    links[currentTheme] = [];
+                }
+                links[currentTheme].push(data[0]);
+
+                // Log de l'activité
+                await logActivity('create_link', { 
+                    theme_id: currentTheme, 
+                    link_title: title,
+                    link_url: url 
+                });
+
+                renderLinks(currentTheme);
+                showNotification('Lien ajouté avec succès !');
+                return true;
+
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout du lien:', error);
+                showNotification('Erreur lors de l\'ajout du lien', 'error');
+                return false;
+            }
+        }
+
+        async function logActivity(action, details = {}) {
+            try {
+                const { error } = await supabase
+                    .from('activity_logs')
+                    .insert([
+                        {
+                            user_id: currentUser?.id,
+                            action: action,
+                            details: details,
+                            ip_address: null // Sera rempli côté serveur si nécessaire
+                        }
+                    ]);
+
+                if (error) throw error;
+            } catch (error) {
+                console.error('Erreur lors de l\'enregistrement du log:', error);
+            }
+        }
+
+        // Fonctions de rendu
+        function renderThemes() {
+            const grid = document.getElementById('themesGrid');
+            grid.innerHTML = '';
+
+            // Render existing themes
+            themes.forEach(theme => {
+                const themeCard = document.createElement('div');
+                themeCard.className = 'theme-card';
+                themeCard.onclick = () => showTheme(theme.id);
+                themeCard.innerHTML = `
+                    <span class="theme-emoji">${theme.emoji}</span>
+                    <h3 class="theme-title">${theme.title}</h3>
+                    <p class="theme-description">${theme.description || ''}</p>
+                `;
+                grid.appendChild(themeCard);
+            });
+
+            // Add new theme button (seulement pour admin et managers)
+            if (window.userRole === 'admin' || window.userRole === 'manager') {
+                const addThemeCard = document.createElement('div');
+                addThemeCard.className = 'theme-card add-theme';
+                addThemeCard.onclick = showAddThemeModal;
+                addThemeCard.innerHTML = `
+                    <span class="theme-emoji">➕</span>
+                    <h3 class="theme-title">Créer un nouveau thème</h3>
+                    <p class="theme-description">Ajouter une nouvelle catégorie</p>
+                `;
+                grid.appendChild(addThemeCard);
+            }
+        }
+
+        function renderLinks(themeId) {
+            const grid = document.getElementById('linksGrid');
+            grid.innerHTML = '';
+
+            const themeLinks = links[themeId] || [];
+            
+            // Afficher TOUS les liens pour TOUS les utilisateurs connectés
+            themeLinks.forEach(link => {
+                const linkCard = document.createElement('div');
+                linkCard.className = 'link-card';
+                linkCard.onclick = () => {
+                    window.open(link.url, '_blank');
+                    logActivity('open_link', { 
+                        link_id: link.id,
+                        link_title: link.title,
+                        link_url: link.url 
+                    });
+                };
+                linkCard.innerHTML = `
+                    <span class="link-emoji">${link.emoji}</span>
+                    <div class="link-info">
+                        <div class="link-title">${link.title}</div>
+                        <span class="link-type">${link.type}</span>
+                    </div>
+                `;
+                grid.appendChild(linkCard);
+            });
+
+            // Afficher le bouton "Ajouter lien" seulement si l'utilisateur a les droits
+            const addLinkBtn = document.querySelector('.add-link-btn');
+            if (addLinkBtn) {
+                if (canCreateLinks(themeId)) {
+                    addLinkBtn.style.display = 'flex';
+                } else {
+                    addLinkBtn.style.display = 'none';
+                }
+            }
+        }
+
+        // Fonctions de modal
+        function showAddThemeModal() {
+            document.getElementById('addThemeModal').style.display = 'block';
+        }
+
+        function showAddLinkModal() {
+            if (!currentTheme) return;
+            document.getElementById('addLinkModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Fonctions de validation
+        function validateGoogleDriveUrl(url) {
+            const drivePattern = /^https:\/\/(drive\.google\.com|docs\.google\.com)/;
+            return drivePattern.test(url);
+        }
+
+        function validateEmail(email) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailPattern.test(email);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier si l'utilisateur est déjà connecté
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    currentUser = session.user;
+                    loadUserProfile();
+                    showDashboard();
+                } else {
+                    showLoginPage();
+                }
+            });
+
+            // Écouter les changements d'authentification
+            supabase.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN') {
+                    currentUser = session.user;
+                    loadUserProfile();
+                    showDashboard();
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    showLoginPage();
+                }
+            });
+
+            // Formulaire de connexion
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                if (!validateEmail(email)) {
+                    showNotification('Veuillez entrer un email valide', 'error');
+                    return;
+                }
+
+                await login(email, password);
+            });
+
+            // Formulaire d'inscription
+            document.getElementById('signupForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const fullName = document.getElementById('fullName').value;
+
+                if (!validateEmail(email)) {
+                    showNotification('Veuillez entrer un email valide', 'error');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showNotification('Le mot de passe doit contenir au moins 6 caractères', 'error');
+                    return;
+                }
+
+                await signup(email, password, fullName);
+            });
+
+            // Formulaire d'ajout de thème
+            document.getElementById('addThemeForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const emoji = document.getElementById('themeEmoji').value;
+                const title = document.getElementById('themeName').value;
+                const description = document.getElementById('themeDescription').value;
+
+                if (await addTheme(emoji, title, description)) {
+                    closeModal('addThemeModal');
+                    this.reset();
+                }
+            });
+
+            // Formulaire d'ajout de lien
+            document.getElementById('addLinkForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const emoji = document.getElementById('linkEmoji').value;
+                const title = document.getElementById('linkTitle').value;
+                const url = document.getElementById('linkUrl').value;
+                const type = document.getElementById('linkType').value;
+
+                if (!validateGoogleDriveUrl(url)) {
+                    showNotification('Veuillez entrer un lien Google Drive valide', 'error');
+                    return;
+                }
+
+                if (await addLink(emoji, title, url, type)) {
+                    closeModal('addLinkModal');
+                    this.reset();
+                }
+            });
+
+            // Liens de navigation entre login/signup
+            document.getElementById('showSignup').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSignupPage();
+            });
+
+            document.getElementById('showLogin').addEventListener('click', function(e) {
+                e.preventDefault();
+                showLoginPage();
+            });
+
+            // Validation en temps réel
+            document.getElementById('linkUrl').addEventListener('input', function(e) {
+                const url = e.target.value;
+                if (url && !validateGoogleDriveUrl(url)) {
+                    e.target.classList.add('error');
+                    e.target.title = 'Veuillez entrer un lien Google Drive valide';
+                } else {
+                    e.target.classList.remove('error');
+                    e.target.title = '';
+                }
+            });
+
+            document.getElementById('themeName').addEventListener('input', function(e) {
+                const name = e.target.value;
+                const id = name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                const exists = themes.some(theme => theme.id === id);
+                
+                if (exists && name) {
+                    e.target.classList.add('error');
+                    e.target.title = 'Un thème avec ce nom existe déjà';
+                } else {
+                    e.target.classList.remove('error');
+                    e.target.title = '';
+                }
+            });
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // ESC to close modals
+                if (e.key === 'Escape') {
+                    const modals = document.querySelectorAll('.modal');
+                    modals.forEach(modal => {
+                        if (modal.style.display === 'block') {
+                            modal.style.display = 'none';
+                        }
+                    });
+                }
+                
+                // Alt + H to go home
+                if (e.altKey && e.key === 'h') {
+                    e.preventDefault();
+                    if (currentUser) {
+                        showHome();
+                    }
+                }
+            });
+
+            // Prevent form submission on Enter in emoji fields
+            document.querySelectorAll('input[name="themeEmoji"], input[name="linkEmoji"]').forEach(input => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+
+        // Fonctions globales
+        window.showHome = showHome;
+        window.showTheme = showTheme;
+        window.logout = logout;
+        window.showAddThemeModal = showAddThemeModal;
+        window.showAddLinkModal = showAddLinkModal;
+        window.closeModal = closeModal;
+    </script>
 </body>
 </html>
