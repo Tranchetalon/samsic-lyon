@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -741,7 +741,7 @@
             color: #7f8c8d;
         }
 
-        /* Notifications et états */
+        /* Notifications */
         .notification {
             position: fixed;
             top: 20px;
@@ -777,28 +777,40 @@
             box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
         }
 
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
+        /* Statistiques */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--primary-color);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 10px;
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            text-align: center;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        [data-theme="dark"] .stat-card {
+            background: var(--light-color);
         }
 
-        /* Filtres et tri */
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        /* Filtres */
         .filters-container {
             display: flex;
             gap: 15px;
@@ -827,7 +839,26 @@
             color: var(--dark-color);
         }
 
-        /* Responsive Design */
+        .favorites-filter {
+            background: var(--warning-color);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .favorites-filter:hover {
+            background: #e67e22;
+        }
+
+        .favorites-filter.active {
+            background: var(--danger-color);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .themes-grid, .links-grid {
                 grid-template-columns: 1fr;
@@ -878,27 +909,29 @@
             margin-top: 20px;
         }
 
-        /* États des boutons favoris */
-        .favorites-filter {
-            background: var(--warning-color);
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: var(--transition);
+        /* Chargement */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
 
-        .favorites-filter:hover {
-            background: #e67e22;
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
         }
 
-        .favorites-filter.active {
-            background: var(--danger-color);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        /* Indicateurs de statut */
+        /* Statuts */
         .status-indicator {
             width: 8px;
             height: 8px;
@@ -913,39 +946,6 @@
 
         .status-indicator.offline {
             background: #95a5a6;
-        }
-
-        /* Statistiques rapides */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
-            text-align: center;
-        }
-
-        [data-theme="dark"] .stat-card {
-            background: var(--light-color);
-        }
-
-        .stat-number {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            color: #7f8c8d;
-            font-weight: 500;
         }
 
         /* Code de vérification 2FA */
@@ -1241,7 +1241,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
-        // Configuration Supabase
+        // Configuration Supabase - Remplacez par vos propres clés
         const SUPABASE_URL = 'https://jyriyfakqbgpqtdxnzpz.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5cml5ZmFrcWJncHF0ZHhuenB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxNjQ5MTgsImV4cCI6MjA2NTc0MDkxOH0.daVcvdk2IbyCWNQsLrM2CvVBgJdkAcEWS7iNsa939W4';
 
@@ -1254,7 +1254,7 @@
         let themes = [];
         let links = {};
         let userFavorites = [];
-        let allLinks = []; // Pour la recherche globale
+        let allLinks = [];
         let showingFavoritesOnly = false;
 
         // Variables globales pour les permissions
@@ -1298,7 +1298,7 @@
             }
         }
 
-        // ===== GESTION DU THÈME SOMBRE =====
+        // ===== GESTION DU THÈME =====
 
         function toggleTheme() {
             const body = document.body;
@@ -1354,81 +1354,28 @@
             }
         }
 
-        // ===== AUTHENTIFICATION ET 2FA =====
-
-        async function generateVerificationCode(purpose = 'login') {
-            try {
-                const { data, error } = await supabase.rpc('generate_verification_code', {
-                    user_uuid: currentUser.id,
-                    purpose_param: purpose
-                });
-
-                if (error) throw error;
-                return data;
-            } catch (error) {
-                console.error('Erreur lors de la génération du code:', error);
-                return null;
-            }
-        }
-
-        async function verifyCode(code, purpose = 'login') {
-            try {
-                const { data, error } = await supabase.rpc('verify_code', {
-                    user_uuid: currentUser.id,
-                    code_param: code,
-                    purpose_param: purpose
-                });
-
-                if (error) throw error;
-                return data;
-            } catch (error) {
-                console.error('Erreur lors de la vérification du code:', error);
-                return false;
-            }
-        }
-
-        async function sendVerificationEmail(code) {
-            // En production, vous devriez utiliser un service d'email
-            // Pour cette démo, on simule l'envoi
-            console.log(`Code de vérification: ${code}`);
-            
-            // Simulation d'envoi d'email via un service externe
-            try {
-                // Ici vous intégreriez votre service d'email (SendGrid, Mailgun, etc.)
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Simulation
-                return true;
-            } catch (error) {
-                console.error('Erreur lors de l\'envoi de l\'email:', error);
-                return false;
-            }
-        }
+        // ===== AUTHENTIFICATION (VERSION SIMPLIFIÉE POUR DÉMO) =====
 
         async function login(email, password) {
             const loginBtn = document.getElementById('loginBtn');
             setLoading(loginBtn, true);
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                if (error) throw error;
-
-                currentUser = data.user;
-                
-                // Générer et envoyer le code 2FA
-                const code = await generateVerificationCode('login');
-                if (code) {
-                    await sendVerificationEmail(code);
-                    showVerificationPage();
-                    showNotification('Code de vérification envoyé par email');
+                // Simulation d'authentification pour la démo
+                if (email && password) {
+                    currentUser = { 
+                        id: 'demo-user-id', 
+                        email: email,
+                        user_metadata: { full_name: 'Utilisateur Démo' }
+                    };
+                    
+                    await loadUserProfile();
+                    showDashboard();
+                    showNotification('Connexion réussie !');
+                    return true;
                 } else {
-                    throw new Error('Impossible de générer le code de vérification');
+                    throw new Error('Email et mot de passe requis');
                 }
-
-                return true;
-
             } catch (error) {
                 console.error('Erreur de connexion:', error);
                 showNotification(error.message, 'error');
@@ -1438,55 +1385,19 @@
             }
         }
 
-        async function verify2FA(code) {
-            const verifyBtn = document.getElementById('verifyBtn');
-            setLoading(verifyBtn, true);
-
-            try {
-                const isValid = await verifyCode(code, 'login');
-                
-                if (isValid) {
-                    await loadUserProfile();
-                    await loadUserPreferences();
-                    showDashboard();
-                    showNotification('Connexion réussie !');
-                    return true;
-                } else {
-                    showNotification('Code de vérification invalide ou expiré', 'error');
-                    return false;
-                }
-
-            } catch (error) {
-                console.error('Erreur de vérification:', error);
-                showNotification('Erreur lors de la vérification', 'error');
-                return false;
-            } finally {
-                setLoading(verifyBtn, false);
-            }
-        }
-
         async function signup(email, password, fullName) {
             const signupBtn = document.getElementById('signupBtn');
             setLoading(signupBtn, true);
 
             try {
-                const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: fullName,
-                            username: email
-                        }
-                    }
-                });
-
-                if (error) throw error;
-
-                showNotification('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
-                showLoginPage();
-                return true;
-
+                // Simulation pour la démo
+                if (email && password && fullName) {
+                    showNotification('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
+                    showLoginPage();
+                    return true;
+                } else {
+                    throw new Error('Tous les champs sont requis');
+                }
             } catch (error) {
                 console.error('Erreur de création de compte:', error);
                 showNotification(error.message, 'error');
@@ -1498,29 +1409,20 @@
 
         async function logout() {
             if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-                try {
-                    const { error } = await supabase.auth.signOut();
-                    if (error) throw error;
-                    
-                    currentUser = null;
-                    currentTheme = null;
-                    userFavorites = [];
-                    window.userRole = 'user';
-                    window.userPermissions = {};
-                    
-                    showLoginPage();
-                    showNotification('Déconnexion réussie');
-                } catch (error) {
-                    console.error('Erreur de déconnexion:', error);
-                    showNotification('Erreur lors de la déconnexion', 'error');
-                }
+                currentUser = null;
+                currentTheme = null;
+                userFavorites = [];
+                window.userRole = 'user';
+                window.userPermissions = {};
+                
+                showLoginPage();
+                showNotification('Déconnexion réussie');
             }
         }
 
         // ===== NAVIGATION =====
 
-        function showLoginPage
-function showLoginPage() {
+        function showLoginPage() {
             document.getElementById('loginPage').classList.remove('hidden');
             document.getElementById('signupPage').classList.add('hidden');
             document.getElementById('verificationPage').classList.add('hidden');
@@ -1536,15 +1438,6 @@ function showLoginPage() {
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('searchContainer').style.display = 'none';
             document.getElementById('signupForm').reset();
-        }
-
-        function showVerificationPage() {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('signupPage').classList.add('hidden');
-            document.getElementById('verificationPage').classList.remove('hidden');
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('searchContainer').style.display = 'none';
-            document.getElementById('verificationForm').reset();
         }
 
         function showDashboard() {
@@ -1563,10 +1456,9 @@ function showLoginPage() {
             document.getElementById('headerTitle').textContent = 'SAMSIC SÉCURITÉ';
             document.getElementById('breadcrumbText').textContent = 'Tableau de Bord Principal';
             
-            // Afficher les contrôles admin si nécessaire
             updateAdminControls();
-            
             loadThemes();
+            
             if (window.userRole === 'admin') {
                 loadAdminStats();
                 loadAdminPanel();
@@ -1587,7 +1479,6 @@ function showLoginPage() {
             document.getElementById('breadcrumbText').innerHTML = 
                 `<a href="#" onclick="showHome()">Accueil</a> > ${theme.title}`;
             
-            // Mettre à jour le bouton d'ajout de lien selon les permissions
             const addLinkBtn = document.getElementById('addLinkBtn');
             if (canCreateLinks(themeId)) {
                 addLinkBtn.style.display = 'flex';
@@ -1598,42 +1489,19 @@ function showLoginPage() {
             loadLinks(themeId);
         }
 
-        // ===== GESTION DES PERMISSIONS =====
+        // ===== PERMISSIONS =====
 
-        async function loadUserPermissions() {
+        async function loadUserProfile() {
             if (!currentUser) return;
 
             try {
-                const { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('role')
-                    .eq('id', currentUser.id)
-                    .single();
-
-                if (profileError) throw profileError;
-
-                window.userRole = profile.role;
+                // Simulation pour la démo
+                document.getElementById('userInfo').textContent = `👤 ${currentUser.user_metadata?.full_name || currentUser.email}`;
+                window.userRole = 'admin'; // Pour la démo, on met admin
                 window.userPermissions = {};
-
-                if (profile.role === 'manager') {
-                    const { data: permissions, error: permError } = await supabase
-                        .from('user_theme_permissions')
-                        .select('theme_id, can_edit, can_create_links, can_delete_links')
-                        .eq('user_id', currentUser.id);
-
-                    if (permError && permError.code !== 'PGRST116') throw permError;
-
-                    if (permissions) {
-                        permissions.forEach(perm => {
-                            window.userPermissions[perm.theme_id] = perm;
-                        });
-                    }
-                }
-
             } catch (error) {
-                console.error('Erreur lors du chargement des permissions:', error);
-                window.userRole = 'user';
-                window.userPermissions = {};
+                console.error('Erreur lors du chargement du profil:', error);
+                document.getElementById('userInfo').textContent = `👤 ${currentUser.email}`;
             }
         }
 
@@ -1666,50 +1534,24 @@ function showLoginPage() {
                     <button class="admin-btn" onclick="downloadLogs()">📊 Export Logs</button>
                 `;
                 
-                // Afficher les statistiques
                 document.getElementById('statsContainer').style.display = 'grid';
             } else {
                 document.getElementById('statsContainer').style.display = 'none';
             }
         }
 
-        // ===== CHARGEMENT DES DONNÉES =====
-
-        async function loadUserProfile() {
-            if (!currentUser) return;
-
-            try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', currentUser.id)
-                    .single();
-
-                if (error && error.code !== 'PGRST116') throw error;
-
-                if (data) {
-                    document.getElementById('userInfo').textContent = `👤 ${data.full_name || data.username}`;
-                } else {
-                    document.getElementById('userInfo').textContent = `👤 ${currentUser.email}`;
-                }
-
-                await loadUserPermissions();
-            } catch (error) {
-                console.error('Erreur lors du chargement du profil:', error);
-                document.getElementById('userInfo').textContent = `👤 ${currentUser.email}`;
-            }
-        }
+        // ===== CHARGEMENT DES DONNÉES (VERSION DÉMO) =====
 
         async function loadThemes() {
             try {
-                const { data, error } = await supabase
-                    .from('themes')
-                    .select('*')
-                    .order('created_at');
-
-                if (error) throw error;
-
-                themes = data || [];
+                // Données de démo
+                themes = [
+                    { id: 'ressources_humaines', emoji: '👥', title: 'Ressources Humaines', description: 'Documents RH et paie', created_at: new Date() },
+                    { id: 'procedures', emoji: '📋', title: 'Procédures', description: 'Procédures et protocoles', created_at: new Date() },
+                    { id: 'formations', emoji: '🎓', title: 'Formations', description: 'Modules de formation', created_at: new Date() },
+                    { id: 'materiel', emoji: '🔧', title: 'Matériel', description: 'Gestion du matériel', created_at: new Date() },
+                ];
+                
                 await loadUserFavorites();
                 renderThemes();
             } catch (error) {
@@ -1720,15 +1562,27 @@ function showLoginPage() {
 
         async function loadLinks(themeId) {
             try {
-                const { data, error } = await supabase
-                    .from('links')
-                    .select('*')
-                    .eq('theme_id', themeId)
-                    .order('created_at');
+                // Données de démo
+                const demoLinks = {
+                    'ressources_humaines': [
+                        { id: '1', emoji: '📄', title: 'Contrats types', url: 'https://drive.google.com/demo1', type: 'document' },
+                        { id: '2', emoji: '💰', title: 'Grilles salariales', url: 'https://drive.google.com/demo2', type: 'document' }
+                    ],
+                    'procedures': [
+                        { id: '3', emoji: '🚨', title: 'Procédure urgence', url: 'https://drive.google.com/demo3', type: 'document' },
+                        { id: '4', emoji: '🔒', title: 'Protocole sécurité', url: 'https://drive.google.com/demo4', type: 'document' }
+                    ],
+                    'formations': [
+                        { id: '5', emoji: '🎥', title: 'Module sécurité', url: 'https://drive.google.com/demo5', type: 'fichier' },
+                        { id: '6', emoji: '📚', title: 'Guide d\'accueil', url: 'https://drive.google.com/demo6', type: 'document' }
+                    ],
+                    'materiel': [
+                        { id: '7', emoji: '📦', title: 'Inventaire', url: 'https://drive.google.com/demo7', type: 'document' },
+                        { id: '8', emoji: '🔧', title: 'Maintenance', url: 'https://drive.google.com/demo8', type: 'document' }
+                    ]
+                };
 
-                if (error) throw error;
-
-                links[themeId] = data || [];
+                links[themeId] = demoLinks[themeId] || [];
                 renderLinks(themeId);
             } catch (error) {
                 console.error('Erreur lors du chargement des liens:', error);
@@ -1738,161 +1592,60 @@ function showLoginPage() {
 
         async function loadAllLinks() {
             try {
-                const { data, error } = await supabase
-                    .from('links')
-                    .select(`
-                        *,
-                        themes (title, emoji)
-                    `)
-                    .order('created_at');
-
-                if (error) throw error;
-
-                allLinks = data || [];
+                allLinks = [];
+                for (const theme of themes) {
+                    const themeLinks = links[theme.id] || [];
+                    themeLinks.forEach(link => {
+                        allLinks.push({
+                            ...link,
+                            theme_id: theme.id,
+                            themes: { title: theme.title, emoji: theme.emoji }
+                        });
+                    });
+                }
             } catch (error) {
                 console.error('Erreur lors du chargement de tous les liens:', error);
             }
         }
 
         async function loadUserFavorites() {
-            if (!currentUser) return;
+            userFavorites = ['1', '3', '5']; // Démo
+        }
+
+        async function loadAdminStats() {
+            try {
+                // Statistiques de démo
+                document.getElementById('totalUsers').textContent = '15';
+                document.getElementById('activeToday').textContent = '8';
+                document.getElementById('totalThemes').textContent = themes.length;
+                document.getElementById('totalLinks').textContent = Object.values(links).flat().length;
+            } catch (error) {
+                console.error('Erreur lors du chargement des statistiques:', error);
+            }
+        }
+
+        async function loadAdminPanel() {
+            if (window.userRole !== 'admin') return;
 
             try {
-                const { data, error } = await supabase
-                    .from('user_favorites')
-                    .select('link_id')
-                    .eq('user_id', currentUser.id);
+                const demoUsers = [
+                    { id: '1', full_name: 'Marie Dupont', email: 'marie.dupont@samsic.fr', role: 'manager', status: 'online', actions_today: 15 },
+                    { id: '2', full_name: 'Jean Martin', email: 'jean.martin@samsic.fr', role: 'user', status: 'offline', actions_today: 8 },
+                    { id: '3', full_name: 'Sophie Bernard', email: 'sophie.bernard@samsic.fr', role: 'user', status: 'online', actions_today: 12 }
+                ];
 
-                if (error) throw error;
+                const demoActivities = [
+                    { action: 'login', created_at: new Date(), profiles: { full_name: 'Marie Dupont' }, details: {} },
+                    { action: 'create_link', created_at: new Date(), profiles: { full_name: 'Jean Martin' }, details: { link_title: 'Nouveau document' } },
+                    { action: 'open_link', created_at: new Date(), profiles: { full_name: 'Sophie Bernard' }, details: { link_title: 'Contrats types' } }
+                ];
 
-                userFavorites = data ? data.map(fav => fav.link_id) : [];
-            } catch (error) {
-                console.error('Erreur lors du chargement des favoris:', error);
-                userFavorites = [];
-            }
-        }
-
-        // ===== GESTION DES FAVORIS =====
-
-        async function toggleFavorite(linkId) {
-            if (!currentUser) return;
-
-            try {
-                const isFavorite = userFavorites.includes(linkId);
-
-                if (isFavorite) {
-                    const { error } = await supabase
-                        .from('user_favorites')
-                        .delete()
-                        .eq('user_id', currentUser.id)
-                        .eq('link_id', linkId);
-
-                    if (error) throw error;
-
-                    userFavorites = userFavorites.filter(id => id !== linkId);
-                    showNotification('Retiré des favoris');
-                } else {
-                    const { error } = await supabase
-                        .from('user_favorites')
-                        .insert([{
-                            user_id: currentUser.id,
-                            link_id: linkId
-                        }]);
-
-                    if (error) throw error;
-
-                    userFavorites.push(linkId);
-                    showNotification('Ajouté aux favoris');
-                }
-
-                // Rafraîchir l'affichage
-                if (currentTheme) {
-                    renderLinks(currentTheme);
-                }
+                renderUsersList(demoUsers);
+                renderActivitiesList(demoActivities);
 
             } catch (error) {
-                console.error('Erreur lors de la gestion des favoris:', error);
-                showNotification('Erreur lors de la gestion des favoris', 'error');
+                console.error('Erreur lors du chargement du panel admin:', error);
             }
-        }
-
-        // ===== RECHERCHE GLOBALE =====
-
-        function initializeSearch() {
-            const searchInput = document.getElementById('globalSearch');
-            const searchResults = document.getElementById('searchResults');
-            let searchTimeout;
-
-            searchInput.addEventListener('input', function(e) {
-                clearTimeout(searchTimeout);
-                const query = e.target.value.trim();
-
-                if (query.length < 2) {
-                    searchResults.style.display = 'none';
-                    return;
-                }
-
-                searchTimeout = setTimeout(() => {
-                    performSearch(query);
-                }, 300);
-            });
-
-            searchInput.addEventListener('focus', function() {
-                if (this.value.trim().length >= 2) {
-                    searchResults.style.display = 'block';
-                }
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                    searchResults.style.display = 'none';
-                }
-            });
-        }
-
-        function performSearch(query) {
-            const searchResults = document.getElementById('searchResults');
-            const results = allLinks.filter(link => 
-                link.title.toLowerCase().includes(query.toLowerCase()) ||
-                link.themes.title.toLowerCase().includes(query.toLowerCase())
-            );
-
-            if (results.length === 0) {
-                searchResults.innerHTML = '<div class="search-result-item">Aucun résultat trouvé</div>';
-            } else {
-                searchResults.innerHTML = results.map(link => `
-                    <div class="search-result-item" onclick="openSearchResult('${link.theme_id}', '${link.id}')">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 20px;">${link.themes.emoji}</span>
-                            <div>
-                                <div style="font-weight: 600;">${link.title}</div>
-                                <div style="font-size: 12px; color: #7f8c8d;">${link.themes.title} • ${link.type}</div>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            searchResults.style.display = 'block';
-        }
-
-        function openSearchResult(themeId, linkId) {
-            document.getElementById('searchResults').style.display = 'none';
-            document.getElementById('globalSearch').value = '';
-            
-            // Aller au thème et scroller vers le lien
-            showTheme(themeId);
-            
-            setTimeout(() => {
-                const linkElement = document.querySelector(`[data-link-id="${linkId}"]`);
-                if (linkElement) {
-                    linkElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    linkElement.style.boxShadow = '0 0 20px rgba(52, 152, 219, 0.5)';
-                    setTimeout(() => {
-                        linkElement.style.boxShadow = '';
-                    }, 2000);
-                }
-            }, 500);
         }
 
         // ===== RENDU DE L'INTERFACE =====
@@ -1903,7 +1656,6 @@ function showLoginPage() {
 
             let themesToShow = themes;
             
-            // Filtrer par favoris si activé
             if (showingFavoritesOnly) {
                 themesToShow = themes.filter(theme => {
                     const themeLinks = allLinks.filter(link => link.theme_id === theme.id);
@@ -1911,7 +1663,6 @@ function showLoginPage() {
                 });
             }
 
-            // Trier selon la sélection
             const sortBy = document.getElementById('sortThemes')?.value || 'name';
             if (sortBy === 'name') {
                 themesToShow.sort((a, b) => a.title.localeCompare(b.title));
@@ -1931,7 +1682,6 @@ function showLoginPage() {
                 grid.appendChild(themeCard);
             });
 
-            // Bouton d'ajout pour admin et managers
             if (window.userRole === 'admin' || window.userRole === 'manager') {
                 const addThemeCard = document.createElement('div');
                 addThemeCard.className = 'theme-card add-theme';
@@ -1951,7 +1701,6 @@ function showLoginPage() {
 
             let themeLinks = links[themeId] || [];
             
-            // Filtrer par favoris dans le thème si activé
             const themeFilterFavorites = document.getElementById('themeFilterFavorites');
             if (themeFilterFavorites && themeFilterFavorites.classList.contains('active')) {
                 themeLinks = themeLinks.filter(link => userFavorites.includes(link.id));
@@ -1988,59 +1737,6 @@ function showLoginPage() {
                 
                 grid.appendChild(linkCard);
             });
-        }
-
-        // ===== ADMINISTRATION =====
-
-        async function loadAdminStats() {
-            try {
-                const { data, error } = await supabase.rpc('get_usage_stats');
-                
-                if (error) throw error;
-
-                if (data && data.length > 0) {
-                    const stats = data[0];
-                    document.getElementById('totalUsers').textContent = stats.total_users || 0;
-                    document.getElementById('activeToday').textContent = stats.active_users_today || 0;
-                    document.getElementById('totalThemes').textContent = stats.total_themes || 0;
-                    document.getElementById('totalLinks').textContent = stats.total_links || 0;
-                }
-            } catch (error) {
-                console.error('Erreur lors du chargement des statistiques:', error);
-            }
-        }
-
-        async function loadAdminPanel() {
-            if (window.userRole !== 'admin') return;
-
-            try {
-                // Charger la liste des utilisateurs
-                const { data: users, error: usersError } = await supabase
-                    .from('admin_users_view')
-                    .select('*')
-                    .order('account_created', { ascending: false });
-
-                if (usersError) throw usersError;
-
-                renderUsersList(users || []);
-
-                // Charger l'activité récente
-                const { data: activities, error: activitiesError } = await supabase
-                    .from('activity_logs')
-                    .select(`
-                        *,
-                        profiles (full_name, username)
-                    `)
-                    .order('created_at', { ascending: false })
-                    .limit(20);
-
-                if (activitiesError) throw activitiesError;
-
-                renderActivitiesList(activities || []);
-
-            } catch (error) {
-                console.error('Erreur lors du chargement du panel admin:', error);
-            }
         }
 
         function renderUsersList(users) {
@@ -2137,6 +1833,134 @@ function showLoginPage() {
             return `${days}j`;
         }
 
+        // ===== GESTION DES FAVORIS =====
+
+        async function toggleFavorite(linkId) {
+            if (!currentUser) return;
+
+            try {
+                const isFavorite = userFavorites.includes(linkId);
+
+                if (isFavorite) {
+                    userFavorites = userFavorites.filter(id => id !== linkId);
+                    showNotification('Retiré des favoris');
+                } else {
+                    userFavorites.push(linkId);
+                    showNotification('Ajouté aux favoris');
+                }
+
+                if (currentTheme) {
+                    renderLinks(currentTheme);
+                }
+
+            } catch (error) {
+                console.error('Erreur lors de la gestion des favoris:', error);
+                showNotification('Erreur lors de la gestion des favoris', 'error');
+            }
+        }
+
+        // ===== RECHERCHE GLOBALE =====
+
+        function initializeSearch() {
+            const searchInput = document.getElementById('globalSearch');
+            const searchResults = document.getElementById('searchResults');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                const query = e.target.value.trim();
+
+                if (query.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    performSearch(query);
+                }, 300);
+            });
+
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim().length >= 2) {
+                    searchResults.style.display = 'block';
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+        }
+
+        function performSearch(query) {
+            const searchResults = document.getElementById('searchResults');
+            const results = allLinks.filter(link => 
+                link.title.toLowerCase().includes(query.toLowerCase()) ||
+                link.themes.title.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="search-result-item">Aucun résultat trouvé</div>';
+            } else {
+                searchResults.innerHTML = results.map(link => `
+                    <div class="search-result-item" onclick="openSearchResult('${link.theme_id}', '${link.id}')">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 20px;">${link.themes.emoji}</span>
+                            <div>
+                                <div style="font-weight: 600;">${link.title}</div>
+                                <div style="font-size: 12px; color: #7f8c8d;">${link.themes.title} • ${link.type}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            searchResults.style.display = 'block';
+        }
+
+        function openSearchResult(themeId, linkId) {
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('globalSearch').value = '';
+            
+            showTheme(themeId);
+            
+            setTimeout(() => {
+                const linkElement = document.querySelector(`[data-link-id="${linkId}"]`);
+                if (linkElement) {
+                    linkElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    linkElement.style.boxShadow = '0 0 20px rgba(52, 152, 219, 0.5)';
+                    setTimeout(() => {
+                        linkElement.style.boxShadow = '';
+                    }, 2000);
+                }
+            }, 500);
+        }
+
+        // ===== MODALS ET ACTIONS =====
+
+        function showAddThemeModal() {
+            if (!window.userRole || (window.userRole !== 'admin' && window.userRole !== 'manager')) {
+                showNotification('Vous n\'avez pas les droits pour créer un thème', 'error');
+                return;
+            }
+            document.getElementById('addThemeModal').style.display = 'block';
+        }
+
+        function showAddLinkModal() {
+            if (!currentTheme) return;
+            
+            if (!canCreateLinks(currentTheme)) {
+                showNotification('Vous n\'avez pas les droits pour ajouter un lien à ce thème', 'error');
+                return;
+            }
+            document.getElementById('addLinkModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
         function toggleAdminPanel() {
             const panel = document.getElementById('adminPanel');
             if (panel.style.display === 'none' || !panel.style.display) {
@@ -2147,113 +1971,12 @@ function showLoginPage() {
             }
         }
 
-        // ===== GESTION DES UTILISATEURS =====
-
-        async function editUserPermissions(userId, userName) {
-            try {
-                // Charger les permissions actuelles
-                const { data: permissions, error } = await supabase
-                    .from('user_theme_permissions')
-                    .select('*')
-                    .eq('user_id', userId);
-
-                if (error) throw error;
-
-                const modal = document.getElementById('userManagementModal');
-                const content = document.getElementById('userManagementContent');
-                
-                let permissionsHtml = `<h4>Permissions pour ${userName}</h4>`;
-                
-                themes.forEach(theme => {
-                    const perm = permissions?.find(p => p.theme_id === theme.id);
-                    permissionsHtml += `
-                        <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px;">
-                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                <span style="font-size: 24px;">${theme.emoji}</span>
-                                <strong>${theme.title}</strong>
-                            </div>
-                            <div style="display: flex; gap: 15px;">
-                                <label>
-                                    <input type="checkbox" ${perm?.can_edit ? 'checked' : ''} 
-                                           onchange="updatePermission('${userId}', '${theme.id}', 'can_edit', this.checked)">
-                                    Modifier
-                                </label>
-                                <label>
-                                    <input type="checkbox" ${perm?.can_create_links ? 'checked' : ''} 
-                                           onchange="updatePermission('${userId}', '${theme.id}', 'can_create_links', this.checked)">
-                                    Créer liens
-                                </label>
-                                <label>
-                                    <input type="checkbox" ${perm?.can_delete_links ? 'checked' : ''} 
-                                           onchange="updatePermission('${userId}', '${theme.id}', 'can_delete_links', this.checked)">
-                                    Supprimer liens
-                                </label>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                content.innerHTML = permissionsHtml;
-                modal.style.display = 'block';
-
-            } catch (error) {
-                console.error('Erreur lors du chargement des permissions:', error);
-                showNotification('Erreur lors du chargement des permissions', 'error');
-            }
+        function showUserManagement() {
+            showNotification('Utilisez les boutons "Permissions" dans la liste des utilisateurs', 'info');
         }
 
-        async function updatePermission(userId, themeId, permission, value) {
-            try {
-                const { error } = await supabase.rpc('assign_theme_permissions', {
-                    user_uuid: userId,
-                    theme_id_param: themeId,
-                    can_edit_param: permission === 'can_edit' ? value : undefined,
-                    can_create_links_param: permission === 'can_create_links' ? value : undefined,
-                    can_delete_links_param: permission === 'can_delete_links' ? value : undefined
-                });
-
-                if (error) throw error;
-
-                await logActivity('edit_permissions', {
-                    target_user_id: userId,
-                    theme_id: themeId,
-                    permission: permission,
-                    value: value
-                });
-
-                showNotification('Permission mise à jour', 'success');
-
-            } catch (error) {
-                console.error('Erreur lors de la mise à jour des permissions:', error);
-                showNotification('Erreur lors de la mise à jour', 'error');
-            }
-        }
-
-        async function changeUserRole(userId, currentRole) {
-            const newRole = prompt(`Changer le rôle (admin/manager/user) :`, currentRole);
-            if (!newRole || !['admin', 'manager', 'user'].includes(newRole)) return;
-
-            try {
-                const { error } = await supabase
-                    .from('profiles')
-                    .update({ role: newRole })
-                    .eq('id', userId);
-
-                if (error) throw error;
-
-                await logActivity('change_role', {
-                    target_user_id: userId,
-                    old_role: currentRole,
-                    new_role: newRole
-                });
-
-                showNotification('Rôle mis à jour', 'success');
-                loadAdminPanel(); // Rafraîchir la liste
-
-            } catch (error) {
-                console.error('Erreur lors du changement de rôle:', error);
-                showNotification('Erreur lors du changement de rôle', 'error');
-            }
+        function downloadLogs() {
+            showNotification('Fonctionnalité de téléchargement des logs (démo)', 'info');
         }
 
         // ===== AJOUT DE THÈMES ET LIENS =====
@@ -2278,23 +2001,18 @@ function showLoginPage() {
                     return false;
                 }
 
-                const { data, error } = await supabase
-                    .from('themes')
-                    .insert([{
-                        id: themeId,
-                        emoji: emoji,
-                        title: title,
-                        description: description,
-                        created_by: currentUser.id
-                    }])
-                    .select();
+                const newTheme = {
+                    id: themeId,
+                    emoji: emoji,
+                    title: title,
+                    description: description,
+                    created_at: new Date()
+                };
 
-                if (error) throw error;
-
-                themes.push(data[0]);
+                themes.push(newTheme);
                 links[themeId] = [];
                 
-                await logActivity('create_theme', { 
+                logActivity('create_theme', { 
                     theme_id: themeId, 
                     theme_title: title 
                 });
@@ -2319,33 +2037,28 @@ function showLoginPage() {
             }
 
             try {
-                const { data, error } = await supabase
-                    .from('links')
-                    .insert([{
-                        theme_id: currentTheme,
-                        emoji: emoji,
-                        title: title,
-                        url: url,
-                        type: type,
-                        created_by: currentUser.id
-                    }])
-                    .select();
-
-                if (error) throw error;
+                const newLink = {
+                    id: Date.now().toString(),
+                    theme_id: currentTheme,
+                    emoji: emoji,
+                    title: title,
+                    url: url,
+                    type: type
+                };
 
                 if (!links[currentTheme]) {
                     links[currentTheme] = [];
                 }
-                links[currentTheme].push(data[0]);
+                links[currentTheme].push(newLink);
 
-                await logActivity('create_link', { 
+                logActivity('create_link', { 
                     theme_id: currentTheme, 
                     link_title: title,
                     link_url: url 
                 });
 
                 renderLinks(currentTheme);
-                await loadAllLinks(); // Recharger pour la recherche
+                await loadAllLinks();
                 showNotification('Lien ajouté avec succès !');
                 return true;
 
@@ -2356,108 +2069,26 @@ function showLoginPage() {
             }
         }
 
-        // ===== LOGS ET ACTIVITÉ =====
+        // ===== GESTION UTILISATEURS (DÉMO) =====
+
+        async function editUserPermissions(userId, userName) {
+            showNotification(`Édition des permissions pour ${userName} (fonctionnalité démo)`, 'info');
+        }
+
+        async function changeUserRole(userId, currentRole) {
+            const newRole = prompt(`Changer le rôle (admin/manager/user) :`, currentRole);
+            if (!newRole || !['admin', 'manager', 'user'].includes(newRole)) return;
+
+            showNotification(`Rôle changé vers ${newRole} (fonctionnalité démo)`, 'success');
+        }
+
+        // ===== LOGS =====
 
         async function logActivity(action, details = {}) {
             if (!currentUser) return;
-
-            try {
-                const { error } = await supabase
-                    .from('activity_logs')
-                    .insert([{
-                        user_id: currentUser.id,
-                        action: action,
-                        details: details,
-                        theme_id: details.theme_id || null,
-                        link_id: details.link_id || null,
-                        target_user_id: details.target_user_id || null,
-                        severity: details.severity || 'info'
-                    }]);
-
-                if (error) throw error;
-            } catch (error) {
-                console.error('Erreur lors de l\'enregistrement du log:', error);
-            }
-        }
-
-        async function downloadLogs() {
-            try {
-                const { data, error } = await supabase
-                    .from('activity_logs')
-                    .select(`
-                        *,
-                        profiles (full_name, username, email)
-                    `)
-                    .order('created_at', { ascending: false })
-                    .limit(1000);
-
-                if (error) throw error;
-
-                // Convertir en CSV
-                const csvContent = convertToCSV(data);
-                
-                // Télécharger
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `samsic-logs-${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                showNotification('Logs exportés avec succès !');
-
-            } catch (error) {
-                console.error('Erreur lors de l\'export des logs:', error);
-                showNotification('Erreur lors de l\'export', 'error');
-            }
-        }
-
-        function convertToCSV(data) {
-            const headers = ['Date', 'Utilisateur', 'Email', 'Action', 'Détails', 'Sévérité'];
-            const rows = data.map(log => [
-                new Date(log.created_at).toLocaleString('fr-FR'),
-                log.profiles?.full_name || log.profiles?.username || 'Inconnu',
-                log.profiles?.email || 'Inconnu',
-                log.action,
-                JSON.stringify(log.details || {}),
-                log.severity || 'info'
-            ]);
-
-            return [headers, ...rows]
-                .map(row => row.map(field => `"${field}"`).join(','))
-                .join('\n');
-        }
-
-        // ===== MODALS =====
-
-        function showAddThemeModal() {
-            if (!window.userRole || (window.userRole !== 'admin' && window.userRole !== 'manager')) {
-                showNotification('Vous n\'avez pas les droits pour créer un thème', 'error');
-                return;
-            }
-            document.getElementById('addThemeModal').style.display = 'block';
-        }
-
-        function showAddLinkModal() {
-            if (!currentTheme) return;
             
-            if (!canCreateLinks(currentTheme)) {
-                showNotification('Vous n\'avez pas les droits pour ajouter un lien à ce thème', 'error');
-                return;
-            }
-            document.getElementById('addLinkModal').style.display = 'block';
-        }
-
-        function showUserManagement() {
-            // Cette fonction sera appelée par le bouton admin
-            showNotification('Utilisez les boutons "Permissions" dans la liste des utilisateurs', 'info');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            // En mode démo, on log seulement dans la console
+            console.log('Activity logged:', { action, details, user: currentUser.email });
         }
 
         // ===== VALIDATION =====
@@ -2472,7 +2103,7 @@ function showLoginPage() {
             return emailPattern.test(email);
         }
 
-        // ===== FILTRES ET TRI =====
+        // ===== FILTRES =====
 
         function toggleFavoritesFilter() {
             const filterBtn = document.getElementById('favoritesFilter');
@@ -2512,36 +2143,8 @@ function showLoginPage() {
                 document.getElementById('themeToggle').textContent = '☀️';
             }
 
-            // Vérifier si l'utilisateur est déjà connecté
-            supabase.auth.getSession().then(({ data: { session } }) => {
-                if (session) {
-                    currentUser = session.user;
-                    
-                    // Vérifier si besoin de 2FA
-                    const needsVerification = sessionStorage.getItem('needs_verification');
-                    if (needsVerification) {
-                        showVerificationPage();
-                        return;
-                    }
-                    
-                    loadUserProfile().then(() => {
-                        loadUserPreferences();
-                        showDashboard();
-                        loadAllLinks();
-                        initializeSearch();
-                    });
-                } else {
-                    showLoginPage();
-                }
-            });
-
-            // Écouter les changements d'authentification
-            supabase.auth.onAuthStateChange((event, session) => {
-                if (event === 'SIGNED_OUT') {
-                    currentUser = null;
-                    showLoginPage();
-                }
-            });
+            // Afficher la page de connexion par défaut
+            showLoginPage();
 
             // Event listeners pour les formulaires
             document.getElementById('loginForm').addEventListener('submit', async function(e) {
@@ -2574,20 +2177,6 @@ function showLoginPage() {
                 }
 
                 await signup(email, password, fullName);
-            });
-
-            document.getElementById('verificationForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const code = document.getElementById('verificationCode').value;
-
-                if (code.length !== 6) {
-                    showNotification('Le code doit contenir 6 chiffres', 'error');
-                    return;
-                }
-
-                if (await verify2FA(code)) {
-                    sessionStorage.removeItem('needs_verification');
-                }
             });
 
             document.getElementById('addThemeForm').addEventListener('submit', async function(e) {
@@ -2631,18 +2220,6 @@ function showLoginPage() {
                 showLoginPage();
             });
 
-            // Bouton de renvoi de code 2FA
-            document.getElementById('resendCode').addEventListener('click', async function(e) {
-                e.preventDefault();
-                if (currentUser) {
-                    const code = await generateVerificationCode('login');
-                    if (code) {
-                        await sendVerificationEmail(code);
-                        showNotification('Nouveau code envoyé !');
-                    }
-                }
-            });
-
             // Toggle thème
             document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
@@ -2677,11 +2254,6 @@ function showLoginPage() {
                     e.target.classList.remove('error');
                     e.target.title = '';
                 }
-            });
-
-            // Code de vérification - seulement des chiffres
-            document.getElementById('verificationCode').addEventListener('input', function(e) {
-                e.target.value = e.target.value.replace(/[^0-9]/g, '');
             });
 
             // Fermer les modals en cliquant à l'extérieur
@@ -2723,15 +2295,6 @@ function showLoginPage() {
                 }
             });
 
-            // Empêcher la soumission sur Enter dans les champs emoji
-            document.querySelectorAll('input[name="themeEmoji"], input[name="linkEmoji"]').forEach(input => {
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                    }
-                });
-            });
-
             // Event listener pour le filtre de favoris dans les thèmes
             document.addEventListener('click', function(e) {
                 if (e.target.id === 'themeFilterFavorites') {
@@ -2751,10 +2314,25 @@ function showLoginPage() {
         window.showUserManagement = showUserManagement;
         window.downloadLogs = downloadLogs;
         window.editUserPermissions = editUserPermissions;
-        window.updatePermission = updatePermission;
         window.changeUserRole = changeUserRole;
         window.openSearchResult = openSearchResult;
         window.toggleFavorite = toggleFavorite;
+
+        // Initialisation une fois connecté
+        async function initialize() {
+            await loadThemes();
+            await loadAllLinks();
+            initializeSearch();
+        }
+
+        // Simuler une connexion automatique pour la démo (optionnel)
+        // setTimeout(() => {
+        //     currentUser = { id: 'demo', email: 'demo@samsic.fr', user_metadata: { full_name: 'Utilisateur Démo' } };
+        //     loadUserProfile().then(() => {
+        //         showDashboard();
+        //         initialize();
+        //     });
+        // }, 1000);
     </script>
 </body>
-</html><!DOCTYPE html>
+</html>
