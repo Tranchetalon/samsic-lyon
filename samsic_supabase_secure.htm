@@ -902,3 +902,399 @@
                 renderThemes();
             } catch (error) {
                 console.error('Erreur lors du chargement des thèmes:', error);
+                showNotification('Erreur lors du chargement des thèmes', 'error');
+            }
+        }
+
+        async function loadLinks(themeId) {
+            try {
+                const { data, error } = await supabase
+                    .from('links')
+                    .select('*')
+                    .eq('theme_id', themeId)
+                    .order('created_at');
+
+                if (error) throw error;
+
+                links[themeId] = data || [];
+                renderLinks(themeId);
+            } catch (error) {
+                console.error('Erreur lors du chargement des liens:', error);
+                showNotification('Erreur lors du chargement des liens', 'error');
+            }
+        }
+
+        async function addTheme(emoji, title, description) {
+            if (!currentUser) return false;
+
+            try {
+                const themeId = title.toLowerCase()
+                    .replace(/\s+/g, '_')
+                    .replace(/[^a-z0-9_]/g, '')
+                    .substring(0, 20);
+
+                // Vérifier si le thème existe déjà
+                const existingTheme = themes.find(t => t.id === themeId);
+                if (existingTheme) {
+                    showNotification('Un thème avec ce nom existe déjà', 'error');
+                    return false;
+                }
+
+                const { data, error } = await supabase
+                    .from('themes')
+                    .insert([
+                        {
+                            id: themeId,
+                            emoji: emoji,
+                            title: title,
+                            description: description,
+                            created_by: currentUser.id
+                        }
+                    ])
+                    .select();
+
+                if (error) throw error;
+
+                // Ajouter le thème à la liste locale
+                themes.push(data[0]);
+                links[themeId] = [];
+                
+                // Log de l'activité
+                await logActivity('create_theme', { theme_id: themeId, theme_title: title });
+                
+                renderThemes();
+                showNotification('Thème créé avec succès !');
+                return true;
+
+            } catch (error) {
+                console.error('Erreur lors de la création du thème:', error);
+                showNotification('Erreur lors de la création du thème', 'error');
+                return false;
+            }
+        }
+
+        async function addLink(emoji, title, url, type) {
+            if (!currentUser || !currentTheme) return false;
+
+            try {
+                const { data, error } = await supabase
+                    .from('links')
+                    .insert([
+                        {
+                            theme_id: currentTheme,
+                            emoji: emoji,
+                            title: title,
+                            url: url,
+                            type: type,
+                            created_by: currentUser.id
+                        }
+                    ])
+                    .select();
+
+                if (error) throw error;
+
+                // Ajouter le lien à la liste locale
+                if (!links[currentTheme]) {
+                    links[currentTheme] = [];
+                }
+                links[currentTheme].push(data[0]);
+
+                // Log de l'activité
+                await logActivity('create_link', { 
+                    theme_id: currentTheme, 
+                    link_title: title,
+                    link_url: url 
+                });
+
+                renderLinks(currentTheme);
+                showNotification('Lien ajouté avec succès !');
+                return true;
+
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout du lien:', error);
+                showNotification('Erreur lors de l\'ajout du lien', 'error');
+                return false;
+            }
+        }
+
+        async function logActivity(action, details = {}) {
+            try {
+                const { error } = await supabase
+                    .from('activity_logs')
+                    .insert([
+                        {
+                            user_id: currentUser?.id,
+                            action: action,
+                            details: details,
+                            ip_address: null // Sera rempli côté serveur si nécessaire
+                        }
+                    ]);
+
+                if (error) throw error;
+            } catch (error) {
+                console.error('Erreur lors de l\'enregistrement du log:', error);
+            }
+        }
+
+        // Fonctions de rendu
+        function renderThemes() {
+            const grid = document.getElementById('themesGrid');
+            grid.innerHTML = '';
+
+            // Render existing themes
+            themes.forEach(theme => {
+                const themeCard = document.createElement('div');
+                themeCard.className = 'theme-card';
+                themeCard.onclick = () => showTheme(theme.id);
+                themeCard.innerHTML = `
+                    <span class="theme-emoji">${theme.emoji}</span>
+                    <h3 class="theme-title">${theme.title}</h3>
+                    <p class="theme-description">${theme.description || ''}</p>
+                `;
+                grid.appendChild(themeCard);
+            });
+
+            // Add new theme button
+            const addThemeCard = document.createElement('div');
+            addThemeCard.className = 'theme-card add-theme';
+            addThemeCard.onclick = showAddThemeModal;
+            addThemeCard.innerHTML = `
+                <span class="theme-emoji">➕</span>
+                <h3 class="theme-title">Créer un nouveau thème</h3>
+                <p class="theme-description">Ajouter une nouvelle catégorie</p>
+            `;
+            grid.appendChild(addThemeCard);
+        }
+
+        function renderLinks(themeId) {
+            const grid = document.getElementById('linksGrid');
+            grid.innerHTML = '';
+
+            const themeLinks = links[themeId] || [];
+            
+            themeLinks.forEach(link => {
+                const linkCard = document.createElement('div');
+                linkCard.className = 'link-card';
+                linkCard.onclick = () => {
+                    window.open(link.url, '_blank');
+                    logActivity('open_link', { 
+                        link_id: link.id,
+                        link_title: link.title,
+                        link_url: link.url 
+                    });
+                };
+                linkCard.innerHTML = `
+                    <span class="link-emoji">${link.emoji}</span>
+                    <div class="link-info">
+                        <div class="link-title">${link.title}</div>
+                        <span class="link-type">${link.type}</span>
+                    </div>
+                `;
+                grid.appendChild(linkCard);
+            });
+        }
+
+        // Fonctions de modal
+        function showAddThemeModal() {
+            document.getElementById('addThemeModal').style.display = 'block';
+        }
+
+        function showAddLinkModal() {
+            if (!currentTheme) return;
+            document.getElementById('addLinkModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Fonctions de validation
+        function validateGoogleDriveUrl(url) {
+            const drivePattern = /^https:\/\/(drive\.google\.com|docs\.google\.com)/;
+            return drivePattern.test(url);
+        }
+
+        function validateEmail(email) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailPattern.test(email);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier si l'utilisateur est déjà connecté
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    currentUser = session.user;
+                    loadUserProfile();
+                    showDashboard();
+                } else {
+                    showLoginPage();
+                }
+            });
+
+            // Écouter les changements d'authentification
+            supabase.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN') {
+                    currentUser = session.user;
+                    loadUserProfile();
+                    showDashboard();
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    showLoginPage();
+                }
+            });
+
+            // Formulaire de connexion
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                if (!validateEmail(email)) {
+                    showNotification('Veuillez entrer un email valide', 'error');
+                    return;
+                }
+
+                await login(email, password);
+            });
+
+            // Formulaire d'inscription
+            document.getElementById('signupForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const fullName = document.getElementById('fullName').value;
+
+                if (!validateEmail(email)) {
+                    showNotification('Veuillez entrer un email valide', 'error');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showNotification('Le mot de passe doit contenir au moins 6 caractères', 'error');
+                    return;
+                }
+
+                await signup(email, password, fullName);
+            });
+
+            // Formulaire d'ajout de thème
+            document.getElementById('addThemeForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const emoji = document.getElementById('themeEmoji').value;
+                const title = document.getElementById('themeName').value;
+                const description = document.getElementById('themeDescription').value;
+
+                if (await addTheme(emoji, title, description)) {
+                    closeModal('addThemeModal');
+                    this.reset();
+                }
+            });
+
+            // Formulaire d'ajout de lien
+            document.getElementById('addLinkForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const emoji = document.getElementById('linkEmoji').value;
+                const title = document.getElementById('linkTitle').value;
+                const url = document.getElementById('linkUrl').value;
+                const type = document.getElementById('linkType').value;
+
+                if (!validateGoogleDriveUrl(url)) {
+                    showNotification('Veuillez entrer un lien Google Drive valide', 'error');
+                    return;
+                }
+
+                if (await addLink(emoji, title, url, type)) {
+                    closeModal('addLinkModal');
+                    this.reset();
+                }
+            });
+
+            // Liens de navigation entre login/signup
+            document.getElementById('showSignup').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSignupPage();
+            });
+
+            document.getElementById('showLogin').addEventListener('click', function(e) {
+                e.preventDefault();
+                showLoginPage();
+            });
+
+            // Validation en temps réel
+            document.getElementById('linkUrl').addEventListener('input', function(e) {
+                const url = e.target.value;
+                if (url && !validateGoogleDriveUrl(url)) {
+                    e.target.classList.add('error');
+                    e.target.title = 'Veuillez entrer un lien Google Drive valide';
+                } else {
+                    e.target.classList.remove('error');
+                    e.target.title = '';
+                }
+            });
+
+            document.getElementById('themeName').addEventListener('input', function(e) {
+                const name = e.target.value;
+                const id = name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                const exists = themes.some(theme => theme.id === id);
+                
+                if (exists && name) {
+                    e.target.classList.add('error');
+                    e.target.title = 'Un thème avec ce nom existe déjà';
+                } else {
+                    e.target.classList.remove('error');
+                    e.target.title = '';
+                }
+            });
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // ESC to close modals
+                if (e.key === 'Escape') {
+                    const modals = document.querySelectorAll('.modal');
+                    modals.forEach(modal => {
+                        if (modal.style.display === 'block') {
+                            modal.style.display = 'none';
+                        }
+                    });
+                }
+                
+                // Alt + H to go home
+                if (e.altKey && e.key === 'h') {
+                    e.preventDefault();
+                    if (currentUser) {
+                        showHome();
+                    }
+                }
+            });
+
+            // Prevent form submission on Enter in emoji fields
+            document.querySelectorAll('input[name="themeEmoji"], input[name="linkEmoji"]').forEach(input => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+
+        // Fonctions globales
+        window.showHome = showHome;
+        window.showTheme = showTheme;
+        window.logout = logout;
+        window.showAddThemeModal = showAddThemeModal;
+        window.showAddLinkModal = showAddLinkModal;
+        window.closeModal = closeModal;
+    </script>
+</body>
+</html>
